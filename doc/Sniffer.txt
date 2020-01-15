@@ -1,0 +1,249 @@
+REQUEST
+Host: 192.168.4.1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,de-DE;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+GET http://192.168.4.1/
+
+
+
+REPLY
+Accept-Ranges: bytes
+Connection: close
+Content-Length: 2313
+Content-Type: text/html
+Server: lwIP/1.4.0
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>AirDrive - Data Log</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="title" content="AirDrive">
+<style type="text/css">
+body, table {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+background-color: #474747;
+color: #FFFFFF;
+text-align:center; 
+word-wrap: break-word;
+table-layout: fixed; 
+}
+#container {
+height: 100%;
+width: 100%;
+}
+#row0 {
+background: #474747;
+font-size: 60px;
+height: 150px;
+}
+#row1 {
+background: #7d7d7d;
+font-size: 30px;
+}
+#row2 {
+background: #474747;
+font-size: 45px;
+height: 120px;
+}
+#row3 {
+background: #7d7d7d;
+font-size: 45px;
+height: 120px;
+}
+b {
+color: #272727;
+}
+</style>
+</head>
+<body>
+<table class="center" id="container">
+<tr id="row0"><td>AirDrive Data Log</td></tr>
+<tr id="row1"><td>79007300740125007070149015110392<br>001459482905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511038B<br>001500002905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX00790073007401250000004000490740741170701490151103A4<br>001500162905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511039D<br>001500322905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511039F<br>001500482905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX0079007300740125000000400049074074117070149015110398<br>001501002905072003007123-01000000-153037016CHT00074CHT00074N/AXXXXX00790073007401250000004000490740741170701490151103A4<br>001501162905072003007123-01000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511039D<br>00150132...
+<tr id="row2"><td>Page: 212        / 212        <br><a href="index.html?page=1">&laquo; First</a> &nbsp; <a href="index.html?page=211       ">&lsaquo; Previous</a> &nbsp;&nbsp; <a href="index.html?page=212       ">Next &rsaquo;</a> &nbsp; <a href="index.html?page=212        ">Last &raquo;</a></td></tr>
+<tr id="row3"><td><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="settings.html">Settings</a></td></tr>
+</table>
+</body>
+</html>
+
+
+
+FIRST PAGE
+REQUEST
+Host: 192.168.4.1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,de-DE;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Referer: http://192.168.4.1/
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+GET http://192.168.4.1/index.html?page=1 
+
+REPLY
+Accept-Ranges: bytes
+Connection: close
+Content-Length: 3489
+Content-Type: text/html
+Server: lwIP/1.4.0
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>AirDrive - Data Log</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="title" content="AirDrive">
+<style type="text/css">
+body, table {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+background-color: #474747;
+color: #FFFFFF;
+text-align:center; 
+word-wrap: break-word;
+table-layout: fixed; 
+}
+#container {
+height: 100%;
+width: 100%;
+}
+#row0 {
+background: #474747;
+font-size: 60px;
+height: 150px;
+}
+#row1 {
+background: #7d7d7d;
+font-size: 30px;
+}
+#row2 {
+background: #474747;
+font-size: 45px;
+height: 120px;
+}
+#row3 {
+background: #7d7d7d;
+font-size: 45px;
+height: 120px;
+}
+b {
+color: #272727;
+}
+</style>
+</head>
+<body>
+<table class="center" id="container">
+<tr id="row0"><td>AirDrive Data Log</td></tr>
+<tr id="row1"><td>????00000011031B<br>000004162920071004005-70000000000-153000000CHT00074CHT00074N/AXXXXX02180000007300000214000002170000740320320320321103E9<br>000004322910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0219007300730213021402160218074074184999150999110378<br>000004482910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0219007200730213021402160218074074184999150999110372<br>000005002910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX021900720073021302140216021807407418499915099911037D<br>000005162910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0219007200730213021402160218074074184999150999110376<br>000005322910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0219007200730213021402160218074074184999151999110377<br>000005482910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0219007200730213021402160218074074184999151999110370<br>000006002910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0220007200730213021402160218074074184999152999110382<br>000006162910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX022000720073021302140216021807407418499915299911037B<br>000006322910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0221007200730214021502160219074074185999153999110377<br>000006482910072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0221007200730214021502160219074074185999153999110370<br>000007002905072004005128000000000-153037016CHT00074CHT00074N/AXXXXX0222007200730214021502160219074074185999153999110376<br>000007162905072004005127000000000-153037016CHT00074CHT00074N/AXXXXX0222007200730214021602160220074074185999154999110376<br>000007322905072004005127000000000-153037016CHT00074CHT00074N/AXXXXX0223007200730215021602160220074074185999154999110376<br>000007482905072004005127000000000-153037016CHT00074CHT00074N/AXXXXX022300720073021502160216022007407418699915499911036E<br>000008002905072004005127000000000-153037016CHT00074CHT00074N/AXXXXX022300720073021502160216022107407418699915599611037A<br>000008162905072004005127000000000-153037016CHT00074CHT00074N/AXXXXX022400720073021502170216022</td></tr>
+<tr id="row2"><td>Page: 1          / 212        <br><a href="index.html?page=1">&laquo; First</a> &nbsp; <a href="index.html?page=1         ">&lsaquo; Previous</a> &nbsp;&nbsp; <a href="index.html?page=2         ">Next &rsaquo;</a> &nbsp; <a href="index.html?page=212        ">Last &raquo;</a></td></tr>
+<tr id="row3"><td><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="settings.html">Settings</a></td></tr>
+</table>
+</body>
+</html>
+
+
+
+DOWNLOAD
+GET http://192.168.4.1/download.html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>AirDrive - Download</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="title" content="AirDrive">
+<style type="text/css">
+body, table {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+background-color: #474747;
+color: #FFFFFF;
+text-align:center; 
+word-wrap: break-word;
+table-layout: fixed; 
+}
+#container {
+height: 100%;
+width: 100%;
+}
+#row0 {
+background: #474747;
+font-size: 60px;
+height: 150px;
+}
+#row1 {
+background: #7d7d7d;
+font-size: 30px;
+}
+#row2 {
+background: #474747;
+font-size: 45px;
+height: 120px;
+}
+#row3 {
+background: #7d7d7d;
+font-size: 45px;
+height: 120px;
+}
+input {
+font-family:Verdana, Arial, Helvetica, sans-serif;
+font-size: 30px;
+color: #000000;
+text-align:center;
+width: 80%;
+}
+input.checkbox
+{
+width: 30px;
+height: 30px;
+}
+select
+{
+font-size: 30px;
+}
+b {
+color: #faffbe;
+}
+</style>
+</head>
+<body>
+<table class="center" id="container">
+<tr id="row0"><td colspan="2">Download Log File</td></tr>
+<tr id="row1"><td><form action="download.html" method="GET"><br><b>START PAGE</b><br><br>This sets the starting page of the download.<br>Range 1...212        </td><td><input type="text" name="spage" maxlength="4" value="1"></td></tr>
+
+<tr id="row1"><td><br><br><b>PAGE COUNT</b><br><br>This sets number of pages to download<br>Range 1...5        </td><td><input type="text" name="npage" maxlength="1" value="1"></td></tr>
+
+<tr id="row2"><td colspan="2"><input type="hidden" name="action" value="download"><input type="submit" value="Download log file"></form></td></tr>
+<tr id="row3"><td colspan="2"><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="settings.html">Settings</a></td></tr>
+</table>
+</body>
+</html>
+
+
+
+DOWNLOAD 1-5
+REQUEST
+Host: 192.168.4.1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,de-DE;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Referer: http://192.168.4.1/download.html
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+GET http://192.168.4.1/download.html?spage=1&npage=5&action=download
+
+REPLY
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Content-Disposition: attachment; filename=LOG.TXT
+Content-Length: 10240
+Content-Transfer-Encoding: binary
+Content-Type: application/force-download
+Expires: 0
+Pragma: public, no-cache
+
+

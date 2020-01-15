@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,7 @@ public class Server {
     private List<String> pages;
     
     private HttpServer server;
+    private List<String> roots = Arrays.asList("/", "/index.html", "/index.htm");
     
     private static final Map<Page, String> cache = new HashMap<>();
     private enum Page {
@@ -178,6 +180,43 @@ public class Server {
         printf("Server started listening at %s%n", server.getAddress());
     }
     
+    private void handleRoot(HttpExchange exchange) {
+        printHandle("Root", exchange);
+        URI uri = exchange.getRequestURI();
+        try {
+            if (roots.contains(uri.getPath()) &&
+                uri.getQuery() == null &&
+                uri.getFragment() == null) {
+                printf("sending 200 ROOT%n");
+                String data = pages.get(pages.size()-1);
+                if (data.length() > settings.preview()) {
+                    data = data.substring(0, settings.preview()) + "...";
+                }
+                data = data.replace("\n", "<br>");
+                String reply = String.format(Page.ROOT.text(), data, pages.size());
+                sendReply(exchange, 200, reply);
+            } else {
+                printf("sending 404 NOT_FOUND%n");
+                sendReply(exchange, 404, Page.NOT_FOUND.text());
+            }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
+        }
+    }
+    
+    private void sendReply(HttpExchange exchange, int code, String reply) throws IOException {
+        byte[] data = reply.getBytes(UTF_8);
+        try (OutputStream stream = exchange.getResponseBody()) {
+            exchange.sendResponseHeaders(code, data.length);
+            stream.write(data);
+        }
+    }
+    
+    private void printHandle(String prefix, HttpExchange exchange) {
+        printf("%s: %s %s (%s)%n", prefix, exchange.getRequestMethod(), exchange.getRequestURI(), exchange.getRemoteAddress());
+    }
+
     private void printf(String format, Object... args) {
         Runnable run = () -> {
             boolean atEnd;
@@ -201,43 +240,6 @@ public class Server {
             } catch (InvocationTargetException | InterruptedException ex) {
                 ex.printStackTrace();
             }
-        }
-    }
-    
-    private void handleRoot(HttpExchange exchange) {
-        printHandle("Root", exchange);
-        URI uri = exchange.getRequestURI();
-        try {
-            if (uri.getPath().equals("/") &&
-                uri.getQuery() == null &&
-                uri.getFragment() == null) {
-                printf("sending 200 ROOT%n");
-                String data = pages.get(pages.size()-1);
-                if (data.length() > settings.preview()) {
-                    data = data.substring(0, settings.preview()) + "...";
-                }
-                data = data.replace("\n", "<br>");
-                String reply = String.format(Page.ROOT.text(), data, pages.size());
-                sendReply(exchange, 200, reply);
-            } else {
-                printf("sending 404 NOT_FOUND%n");
-                sendReply(exchange, 404, Page.NOT_FOUND.text());
-            }
-        } catch (Throwable ex) {
-            ex.printStackTrace();
-            printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
-        }
-    }
-    
-    private void printHandle(String prefix, HttpExchange exchange) {
-        printf("%s: %s %s (%s)%n", prefix, exchange.getRequestMethod(), exchange.getRequestURI(), exchange.getRemoteAddress());
-    }
-    
-    private void sendReply(HttpExchange exchange, int code, String reply) throws IOException {
-        byte[] data = reply.getBytes(UTF_8);
-        try (OutputStream stream = exchange.getResponseBody()) {
-            exchange.sendResponseHeaders(code, data.length);
-            stream.write(data);
         }
     }
 }

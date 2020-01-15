@@ -14,9 +14,9 @@ public class GenerateTest {
                 for (int lines = 0; lines < 6 * 2_048 / 120; lines++) {
                     for (int i = 0; i < 120; i++) {
                         switch (i) {
-                            case 0:   writer.write('<'); break;
+                            case 0:   writer.write('['); break;
                             default:  writer.write(Character.forDigit(lines % 10, 10)); break;
-                            case 118: writer.write('>'); break;
+                            case 118: writer.write(']'); break;
                             case 119: writer.write('\n'); break;
                         }
                     }

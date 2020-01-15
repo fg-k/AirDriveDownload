@@ -42,4 +42,12 @@ public class Settings {
     public int preview() {
         return 240;
     }
+
+    public int maxPages() {
+        return 5;
+    }
+    
+    public String downloadActionPattern() {
+        return "spage=(.*)&npage=(.*)&action=download";
+    }
 }

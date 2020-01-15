@@ -44,8 +44,15 @@ color: #272727;
 <table class="center" id="container">
 <tr id="row0"><td>AirDrive Data Log</td></tr>
 <tr id="row1"><td>%s
-<tr id="row2"><td>Page: %d        / %2$d        <br><a href="index.html?page=1">&laquo; First</a> &nbsp; <a href="index.html?page=211       ">&lsaquo; Previous</a> &nbsp;&nbsp; <a href="index.html?page=212       ">Next &rsaquo;</a> &nbsp; <a href="index.html?page=212        ">Last &raquo;</a></td></tr>
-<tr id="row3"><td><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="settings.html">Settings</a></td></tr>
+<tr id="row2"><td>Page: %d        / %2$d        <br>
+  <a href="index.html?page=1">&laquo; First</a> &nbsp; 
+  <a href="index.html?page=5       ">&lsaquo; Previous</a> &nbsp;&nbsp; 
+  <a href="index.html?page=6       ">Next &rsaquo;</a> &nbsp; 
+  <a href="index.html?page=6       ">Last &raquo;</a></td></tr>
+<tr id="row3"><td><a href="index.html">Data Log</a> &nbsp;&nbsp; 
+  <a href="download.html">Download</a> &nbsp;&nbsp; 
+  <a href="settings.html">Settings</a>
+</td></tr>
 </table>
 </body>
 </html>

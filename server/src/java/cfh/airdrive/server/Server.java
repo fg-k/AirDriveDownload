@@ -1,13 +1,21 @@
 package cfh.airdrive.server;
 
 import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpExchange;
+
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -45,7 +53,36 @@ public class Server {
     private JTextArea output;
     
     private HttpServer server;
-    private boolean stopped = false;
+    
+    private static final Map<Page, String> cache = new HashMap<>();
+    private enum Page {
+        NOT_FOUND("404.xml"),
+        ROOT("root.xml");
+        
+        private final String file;
+        private Page(String file) {
+            this.file = file;
+        }
+        String text() throws IOException {
+            String page = cache.get(this);
+            if (page == null) {
+                try (InputStream stream = Server.class.getResourceAsStream(file)) {
+                    if (stream == null) {
+                        throw new FileNotFoundException(file);
+                    }
+                    StringBuilder builder = new StringBuilder();
+                    byte[] buffer = new byte[1024];
+                    int count;
+                    while ((count = stream.read(buffer)) != -1) {
+                        builder.append(new String(buffer, 0, count));
+                    }
+                    page = builder.toString();
+                    cache.put(this, page);
+                }
+            }
+            return page;
+        }
+    }
     
     
     private Server() throws InvocationTargetException, InterruptedException, IOException {
@@ -54,7 +91,7 @@ public class Server {
     }
     
     private void initGUI() {
-        output = new JTextArea(20, 60);
+        output = new JTextArea(20, 80);
         output.setEditable(false);
         output.setFont(new Font("monospaced", Font.PLAIN, 12));
         
@@ -73,9 +110,7 @@ public class Server {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (stopped) {
-                    frame.dispose();
-                } else if (server != null) {
+                if (server != null) {
                     new SwingWorker<Void, Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
@@ -85,8 +120,8 @@ public class Server {
                         }
                         @Override
                         protected void done() {
-                            printf("Server closed - Close Window again%n%n");
-                            stopped = true;
+                            JOptionPane.showMessageDialog(frame, "Server closed", "THE END", JOptionPane.INFORMATION_MESSAGE);
+                            frame.dispose();
                         };
                     }.execute();
                 }
@@ -97,7 +132,7 @@ public class Server {
     private void startServer() throws IOException {
         InetSocketAddress address = new InetSocketAddress(8000);
         server = HttpServer.create(address, 0);
-        server.createContext("/", new RootHandler(this::printf));
+        server.createContext("/", this::handleRoot);
         server.start();
         printf("Server started listening at %s%n", server.getAddress());
     }
@@ -128,10 +163,34 @@ public class Server {
         }
     }
     
+    private void handleRoot(HttpExchange exchange) {
+        printHandle("Root", exchange);
+        URI uri = exchange.getRequestURI();
+        try {
+            if (uri.getPath().equals("/") &&
+                uri.getQuery() == null &&
+                uri.getFragment() == null) {
+                printf("sending 200 ROOT%n");
+                sendReply(exchange, 200, Page.ROOT.text());
+            } else {
+                printf("sending 404 NOT_FOUND%n");
+                sendReply(exchange, 404, Page.NOT_FOUND.text());
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
+        }
+    }
     
-    //------------------------------------------------------------------------------------------------------------------
+    private void printHandle(String prefix, HttpExchange exchange) {
+        printf("%s: %s %s (%s)%n", prefix, exchange.getRequestMethod(), exchange.getRequestURI(), exchange.getRemoteAddress());
+    }
     
-    interface Output {
-        void printf(String format, Object... args);
+    private void sendReply(HttpExchange exchange, int code, String reply) throws IOException {
+        byte[] message = reply.getBytes();
+        try (OutputStream stream = exchange.getResponseBody()) {
+            exchange.sendResponseHeaders(code, message.length);
+            stream.write(message);
+        }
     }
 }

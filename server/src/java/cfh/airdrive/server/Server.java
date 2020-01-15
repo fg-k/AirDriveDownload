@@ -52,6 +52,8 @@ public class Server {
     }
     
     
+    private final Settings settings = Settings.instance();
+    
     private JFrame frame;
     private JScrollPane scroll;
     private JTextArea output;
@@ -66,9 +68,11 @@ public class Server {
         ROOT("root.xml");
         
         private final String file;
+        
         private Page(String file) {
             this.file = file;
         }
+        
         String text() throws IOException {
             String page = cache.get(this);
             if (page == null) {
@@ -93,14 +97,19 @@ public class Server {
     
     private Server() throws InvocationTargetException, InterruptedException, IOException {
         SwingUtilities.invokeAndWait(this::initGUI);
-        readData();
-        startServer();
+        try {
+            readData();
+            startServer();
+        } catch (Exception ex) {
+            frame.dispose();
+            throw ex;
+        }
     }
     
     private void initGUI() {
-        output = new JTextArea(20, 80);
+        output = new JTextArea(settings.lines(), settings.columns());
         output.setEditable(false);
-        output.setFont(new Font("monospaced", Font.PLAIN, 12));
+        output.setFont(new Font(settings.fontName(), Font.PLAIN, settings.fontSize()));
         
         scroll = new JScrollPane(output);
         scroll.setHorizontalScrollBarPolicy(scroll.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -113,7 +122,6 @@ public class Server {
         frame.add(scroll, BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -127,23 +135,24 @@ public class Server {
                         }
                         @Override
                         protected void done() {
-                            showMessageDialog(frame, "Server closed", "THE END", INFORMATION_MESSAGE);
+                            showMessageDialog(frame, "Server terminated, close window?", "THE END", INFORMATION_MESSAGE);
                             frame.dispose();
                         };
                     }.execute();
                 }
             }
         });
+        frame.setVisible(true);
     }
     
     private void readData() throws IOException {
-        String file = "test.txt";
+        String file = settings.dataFileName();
         List<String> tmp = new ArrayList<>();
         try (InputStream input = Server.class.getResourceAsStream(file)) {
             if (input == null) {
                 throw new FileNotFoundException(file);
             }
-            byte buffer[] = new byte[2048];
+            byte buffer[] = new byte[settings.pageSize()];
             int offset = 0;
             int count;
             while ((count = input.read(buffer, offset, buffer.length-offset)) > 0) {
@@ -157,11 +166,12 @@ public class Server {
                 tmp.add(new String(buffer, 0, offset, UTF_8));
             }
         }
+        printf("Data %d pages from %s%n", tmp.size(), file);
         pages = tmp;
     }
     
     private void startServer() throws IOException {
-        InetSocketAddress address = new InetSocketAddress(8000);
+        InetSocketAddress address = new InetSocketAddress(settings.port());
         server = HttpServer.create(address, 0);
         server.createContext("/", this::handleRoot);
         server.start();
@@ -202,12 +212,18 @@ public class Server {
                 uri.getQuery() == null &&
                 uri.getFragment() == null) {
                 printf("sending 200 ROOT%n");
-                sendReply(exchange, 200, Page.ROOT.text());
+                String data = pages.get(pages.size()-1);
+                if (data.length() > settings.preview()) {
+                    data = data.substring(0, settings.preview()) + "...";
+                }
+                data = data.replace("\n", "<br>");
+                String reply = String.format(Page.ROOT.text(), data, pages.size());
+                sendReply(exchange, 200, reply);
             } else {
                 printf("sending 404 NOT_FOUND%n");
                 sendReply(exchange, 404, Page.NOT_FOUND.text());
             }
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             ex.printStackTrace();
             printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
         }

@@ -1,7 +1,10 @@
 package cfh.airdrive.server;
 
+import static javax.swing.JOptionPane.*;
+
 import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
+import static java.nio.charset.StandardCharsets.*;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -14,11 +17,12 @@ import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -36,12 +40,12 @@ public class Server {
             ex.printStackTrace();
             String title = ex.getTargetException().getClass().getSimpleName();
             String[] message = { "Unable to create server", ex.getTargetException().getMessage() };
-            JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(null, message, title, ERROR_MESSAGE);
         } catch (IOException ex) {
             ex.printStackTrace();
             String title = ex.getClass().getSimpleName();
             String[] message = { "Unable to start server", ex.getMessage() };
-            JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(null, message, title, ERROR_MESSAGE);
         } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
@@ -51,6 +55,8 @@ public class Server {
     private JFrame frame;
     private JScrollPane scroll;
     private JTextArea output;
+    
+    private List<String> pages;
     
     private HttpServer server;
     
@@ -74,7 +80,7 @@ public class Server {
                     byte[] buffer = new byte[1024];
                     int count;
                     while ((count = stream.read(buffer)) != -1) {
-                        builder.append(new String(buffer, 0, count));
+                        builder.append(new String(buffer, 0, count, UTF_8));
                     }
                     page = builder.toString();
                     cache.put(this, page);
@@ -87,6 +93,7 @@ public class Server {
     
     private Server() throws InvocationTargetException, InterruptedException, IOException {
         SwingUtilities.invokeAndWait(this::initGUI);
+        readData();
         startServer();
     }
     
@@ -120,13 +127,37 @@ public class Server {
                         }
                         @Override
                         protected void done() {
-                            JOptionPane.showMessageDialog(frame, "Server closed", "THE END", JOptionPane.INFORMATION_MESSAGE);
+                            showMessageDialog(frame, "Server closed", "THE END", INFORMATION_MESSAGE);
                             frame.dispose();
                         };
                     }.execute();
                 }
             }
         });
+    }
+    
+    private void readData() throws IOException {
+        String file = "test.txt";
+        List<String> tmp = new ArrayList<>();
+        try (InputStream input = Server.class.getResourceAsStream(file)) {
+            if (input == null) {
+                throw new FileNotFoundException(file);
+            }
+            byte buffer[] = new byte[2048];
+            int offset = 0;
+            int count;
+            while ((count = input.read(buffer, offset, buffer.length-offset)) > 0) {
+                offset += count;
+                if (offset == buffer.length) {
+                    tmp.add(new String(buffer, UTF_8));
+                    offset = 0;
+                }
+            }
+            if (offset > 0) {
+                tmp.add(new String(buffer, 0, offset, UTF_8));
+            }
+        }
+        pages = tmp;
     }
     
     private void startServer() throws IOException {
@@ -187,10 +218,10 @@ public class Server {
     }
     
     private void sendReply(HttpExchange exchange, int code, String reply) throws IOException {
-        byte[] message = reply.getBytes();
+        byte[] data = reply.getBytes(UTF_8);
         try (OutputStream stream = exchange.getResponseBody()) {
-            exchange.sendResponseHeaders(code, message.length);
-            stream.write(message);
+            exchange.sendResponseHeaders(code, data.length);
+            stream.write(data);
         }
     }
 }

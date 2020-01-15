@@ -3,6 +3,8 @@ package cfh.airdrive.server;
 import static javax.swing.JOptionPane.*;
 
 import com.sun.net.httpserver.HttpServer;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import static java.nio.charset.StandardCharsets.*;
 
@@ -22,6 +24,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -66,8 +70,13 @@ public class Server {
     
     private static final Map<Page, String> cache = new HashMap<>();
     private enum Page {
+        BAD_REQUEST("400.xml"),
+        BAD_NUMBER("400_2.xml"),
         NOT_FOUND("404.xml"),
-        ROOT("root.xml");
+        INVALID_METHOD("405.xml"),
+        INTERNAL_ERROR("500.xml"),
+        ROOT("root.xml"),
+        DOWNLOAD("download.xml");
         
         private final String file;
         
@@ -75,7 +84,7 @@ public class Server {
             this.file = file;
         }
         
-        String text() throws IOException {
+        String format(Object... args) throws IOException {
             String page = cache.get(this);
             if (page == null) {
                 try (InputStream stream = Server.class.getResourceAsStream(file)) {
@@ -92,7 +101,7 @@ public class Server {
                     cache.put(this, page);
                 }
             }
-            return page;
+            return String.format(page, args);
         }
     }
     
@@ -184,24 +193,93 @@ public class Server {
         printHandle("Root", exchange);
         URI uri = exchange.getRequestURI();
         try {
-            if (roots.contains(uri.getPath()) &&
-                uri.getQuery() == null &&
-                uri.getFragment() == null) {
+            if (!exchange.getRequestMethod().equals("GET")) {
+                sendReply(exchange, 405, Page.INVALID_METHOD, exchange.getRequestMethod(), uri);
+            } else if (roots.contains(uri.getPath().toLowerCase()) &&
+                    uri.getQuery() == null) {
                 printf("sending 200 ROOT%n");
                 String data = pages.get(pages.size()-1);
                 if (data.length() > settings.preview()) {
                     data = data.substring(0, settings.preview()) + "...";
                 }
                 data = data.replace("\n", "<br>");
-                String reply = String.format(Page.ROOT.text(), data, pages.size());
-                sendReply(exchange, 200, reply);
+                sendReply(exchange, 200, Page.ROOT, data, pages.size());
+            } else if (uri.getPath().equalsIgnoreCase("/download.html")) {
+                handleDownload(exchange);
             } else {
-                printf("sending 404 NOT_FOUND%n");
-                sendReply(exchange, 404, Page.NOT_FOUND.text());
+                sendReply(exchange, 404, Page.NOT_FOUND, uri);
             }
         } catch (Throwable ex) {
             ex.printStackTrace();
             printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
+        }
+    }
+    
+    private void handleDownload(HttpExchange exchange) {
+        printHandle("Download", exchange);
+        URI uri = exchange.getRequestURI();
+        try {
+            if (uri.getQuery() == null) {
+                sendReply(exchange, 200, Page.DOWNLOAD, 1, pages.size(), Math.min(pages.size(), settings.maxPages()));  // TODO max depending on start?
+            } else {
+                Matcher matcher = Pattern.compile(settings.downloadActionPattern()).matcher(uri.getQuery());
+                if (matcher.matches()) {
+                    int start;
+                    int count;
+                    try {
+                        start = Integer.parseInt(matcher.group(1));
+                        count = Integer.parseInt(matcher.group(2));
+                        printf("start: %d, count: %d%n", start, count);
+                        if (start < 1) {
+                            throw new NumberFormatException("spage < 1");
+                        }
+                        if (start > pages.size()) {
+                            throw new NumberFormatException("spage > " + pages.size());
+                        }
+                        if (count < 1) {
+                            throw new NumberFormatException("npage < 1");
+                        }
+                        if (start + count > pages.size()) {
+                            throw new NumberFormatException("spage+npage > " + pages.size());
+                        }
+                    } catch (NumberFormatException ex) {
+                        sendReply(exchange, 400, Page.BAD_NUMBER, uri, ex.getMessage());
+                        return;
+                    }
+                    replyPages(exchange, start, count);
+                } else {
+                    sendReply(exchange, 400, Page.BAD_REQUEST, uri);
+                }
+            }
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
+        }
+    }
+    
+    private void replyPages(HttpExchange exchange, int start, int count) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for (int i = start; i < start+count; i++) {
+            builder.append(pages.get(i-1));
+        }
+        Headers headers = exchange.getResponseHeaders();
+        headers.set("Cache-Control", "store, no-cache, must-revalidate, post-check=0, pre-check=0");
+        headers.set("Content-Disposition", "attachment; filename=LOG.TXT");
+        headers.set("Content-Transfer-Encoding", "binary");
+        headers.set("Content-Type", "application/force-download");
+        headers.set("Expires", "0");
+        headers.set("Pragma", "public, no-cache");
+        sendReply(exchange, 200, builder.toString());
+    }
+    
+    private void sendReply(HttpExchange exchange, int code, Page page, Object... args) throws IOException {
+        printf("sending reply %d %s%n", code, page.name());
+        try {
+            String reply = page.format(args);
+            sendReply(exchange, code, reply);
+        } catch (Exception ex) {
+            sendReply(exchange, 500, Page.INTERNAL_ERROR.format(ex.getClass(), ex.getMessage()));
+            throw ex;
         }
     }
     

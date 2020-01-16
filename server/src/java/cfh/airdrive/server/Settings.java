@@ -11,11 +11,15 @@ public class Settings {
     private Settings() {
     }
 
-    int lines() {
+    public String title() {
+        return "Test Server - 1.0";
+    }
+
+    public int rows() {
         return 20;
     }
 
-    int columns() {
+    public int columns() {
         return 80;
     }
 

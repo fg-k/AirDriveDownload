@@ -1,5 +1,7 @@
 package cfh.airdrive.server;
 
+import java.awt.Font;
+
 public class Settings {
 
     private static final Settings instance = new Settings();
@@ -15,22 +17,18 @@ public class Settings {
         return "Test Server - 1.0";
     }
 
-    public int rows() {
+    public int outputColumns() {
+        return 80;
+    }
+    
+    public int outputRows() {
         return 20;
     }
 
-    public int columns() {
-        return 80;
+    public Font outputFont() {
+        return new Font("monospaced", Font.PLAIN, 14);
     }
-
-    public String fontName() {
-        return "monospaced";
-    }
-
-    public int fontSize() {
-        return 14;
-    }
-
+    
     public String dataFileName() {
         return "test.txt";
     }

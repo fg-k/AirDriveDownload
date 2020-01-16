@@ -3,7 +3,6 @@ package cfh.airdrive.server;
 import static javax.swing.JOptionPane.*;
 
 import com.sun.net.httpserver.HttpServer;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import static java.nio.charset.StandardCharsets.*;
@@ -21,6 +20,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,16 +59,18 @@ public class Server {
     
     private final Settings settings = Settings.instance();
     
-    private JFrame frame;
-    private JScrollPane scroll;
-    private JTextArea output;
+    private final JFrame frame = new JFrame();
+    private final JScrollPane scroll = new JScrollPane();
+    private final JTextArea output = new JTextArea();
     
-    private List<String> pages;
+    private final List<String> pages = new ArrayList<>();
     
     private HttpServer server;
-    private List<String> roots = Arrays.asList("/", "/index.html", "/index.htm");
     
-    private static final Map<Page, String> cache = new HashMap<>();
+    private final List<String> roots = Collections.unmodifiableList(
+        Arrays.asList("/", "/index.html", "/index.htm"));
+    
+    
     private enum Page {
         BAD_REQUEST("400.xml"),
         BAD_NUMBER("400_2.xml"),
@@ -77,6 +79,8 @@ public class Server {
         INTERNAL_ERROR("500.xml"),
         ROOT("root.xml"),
         DOWNLOAD("download.xml");
+        
+        private static final Map<Page, String> cache = new HashMap<>();
         
         private final String file;
         
@@ -118,17 +122,17 @@ public class Server {
     }
     
     private void initGUI() {
-        output = new JTextArea(settings.lines(), settings.columns());
+        output.setRows(settings.rows());
+        output.setColumns(settings.columns());
         output.setEditable(false);
         output.setFont(new Font(settings.fontName(), Font.PLAIN, settings.fontSize()));
         
-        scroll = new JScrollPane(output);
+        scroll.setViewportView(output);
         scroll.setHorizontalScrollBarPolicy(scroll.HORIZONTAL_SCROLLBAR_ALWAYS);
         scroll.setVerticalScrollBarPolicy(scroll.VERTICAL_SCROLLBAR_ALWAYS);
         
-        frame = new JFrame();
         frame.setDefaultCloseOperation(frame.DO_NOTHING_ON_CLOSE);
-        frame.setTitle("Test Server");
+        frame.setTitle(settings.title());
         frame.setLayout(new BorderLayout());
         frame.add(scroll, BorderLayout.CENTER);
         frame.pack();
@@ -158,7 +162,7 @@ public class Server {
     
     private void readData() throws IOException {
         String file = settings.dataFileName();
-        List<String> tmp = new ArrayList<>();
+        pages.clear();
         try (InputStream input = Server.class.getResourceAsStream(file)) {
             if (input == null) {
                 throw new FileNotFoundException(file);
@@ -169,16 +173,15 @@ public class Server {
             while ((count = input.read(buffer, offset, buffer.length-offset)) > 0) {
                 offset += count;
                 if (offset == buffer.length) {
-                    tmp.add(new String(buffer, UTF_8));
+                    pages.add(new String(buffer, UTF_8));
                     offset = 0;
                 }
             }
             if (offset > 0) {
-                tmp.add(new String(buffer, 0, offset, UTF_8));
+                pages.add(new String(buffer, 0, offset, UTF_8));
             }
         }
-        printf("Data %d pages from %s%n", tmp.size(), file);
-        pages = tmp;
+        printf("Data %d pages from %s%n", pages.size(), file);
     }
     
     private void startServer() throws IOException {
@@ -220,7 +223,7 @@ public class Server {
         URI uri = exchange.getRequestURI();
         try {
             if (uri.getQuery() == null) {
-                sendReply(exchange, 200, Page.DOWNLOAD, 1, pages.size(), Math.min(pages.size(), settings.maxPages()));  // TODO max depending on start?
+                sendReply(exchange, 200, Page.DOWNLOAD, 1, pages.size(), Math.min(pages.size(), settings.maxPages()));
             } else {
                 Matcher matcher = Pattern.compile(settings.downloadActionPattern()).matcher(uri.getQuery());
                 if (matcher.matches()) {
@@ -239,14 +242,14 @@ public class Server {
                         if (count < 1) {
                             throw new NumberFormatException("npage < 1");
                         }
-                        if (start + count > pages.size()) {
+                        if (start + count - 1 > pages.size()) {
                             throw new NumberFormatException("spage+npage > " + pages.size());
                         }
                     } catch (NumberFormatException ex) {
                         sendReply(exchange, 400, Page.BAD_NUMBER, uri, ex.getMessage());
                         return;
                     }
-                    replyPages(exchange, start, count);
+                    sendPages(exchange, start, count);
                 } else {
                     sendReply(exchange, 400, Page.BAD_REQUEST, uri);
                 }
@@ -257,7 +260,7 @@ public class Server {
         }
     }
     
-    private void replyPages(HttpExchange exchange, int start, int count) throws IOException {
+    private void sendPages(HttpExchange exchange, int start, int count) throws IOException {
         StringBuilder builder = new StringBuilder();
         for (int i = start; i < start+count; i++) {
             builder.append(pages.get(i-1));
@@ -285,6 +288,8 @@ public class Server {
     
     private void sendReply(HttpExchange exchange, int code, String reply) throws IOException {
         byte[] data = reply.getBytes(UTF_8);
+        System.out.printf("data: %d%n%s%n%s%n", data.length, reply, Arrays.toString(data));
+        System.out.flush();
         try (OutputStream stream = exchange.getResponseBody()) {
             exchange.sendResponseHeaders(code, data.length);
             stream.write(data);

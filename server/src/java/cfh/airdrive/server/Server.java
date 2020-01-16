@@ -8,7 +8,6 @@ import com.sun.net.httpserver.HttpExchange;
 import static java.nio.charset.StandardCharsets.*;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
@@ -24,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,10 +122,10 @@ public class Server {
     }
     
     private void initGUI() {
-        output.setRows(settings.rows());
-        output.setColumns(settings.columns());
         output.setEditable(false);
-        output.setFont(new Font(settings.fontName(), Font.PLAIN, settings.fontSize()));
+        output.setFont(settings.outputFont());
+        output.setColumns(settings.outputColumns());
+        output.setRows(settings.outputRows());
         
         scroll.setViewportView(output);
         scroll.setHorizontalScrollBarPolicy(scroll.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -141,19 +141,27 @@ public class Server {
             @Override
             public void windowClosing(WindowEvent e) {
                 if (server != null) {
-                    new SwingWorker<Void, Void>() {
+                    SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
                         @Override
                         protected Void doInBackground() throws Exception {
-                            printf("Closing server at %s%n", server.getAddress());
+                            info("Closing server at %s%n", server.getAddress());
                             server.stop(1);
                             return null;
                         }
                         @Override
                         protected void done() {
-                            showMessageDialog(frame, "Server terminated, close window?", "THE END", INFORMATION_MESSAGE);
+                            try {
+                                get();
+                            } catch (ExecutionException ex) {
+                                handleException("closing", ex.getCause());
+                            } catch (Exception ex) {
+                                handleException("closing", ex);
+                            }
+                            showMessageDialog(frame, "Server terminated, OK to close window", "THE END", INFORMATION_MESSAGE);
                             frame.dispose();
                         };
-                    }.execute();
+                    };
+                    worker.execute();
                 }
             }
         });
@@ -181,7 +189,7 @@ public class Server {
                 pages.add(new String(buffer, 0, offset, UTF_8));
             }
         }
-        printf("Data %d pages from %s%n", pages.size(), file);
+        info("Read data %d pages from %s%n", pages.size(), file);
     }
     
     private void startServer() throws IOException {
@@ -189,7 +197,7 @@ public class Server {
         server = HttpServer.create(address, 0);
         server.createContext("/", this::handleRoot);
         server.start();
-        printf("Server started listening at %s%n", server.getAddress());
+        info("Server started listening at %s%n", server.getAddress());
     }
     
     private void handleRoot(HttpExchange exchange) {
@@ -200,7 +208,7 @@ public class Server {
                 sendReply(exchange, 405, Page.INVALID_METHOD, exchange.getRequestMethod(), uri);
             } else if (roots.contains(uri.getPath().toLowerCase()) &&
                     uri.getQuery() == null) {
-                printf("sending 200 ROOT%n");
+                info("sending 200 ROOT%n");
                 String data = pages.get(pages.size()-1);
                 if (data.length() > settings.preview()) {
                     data = data.substring(0, settings.preview()) + "...";
@@ -213,8 +221,7 @@ public class Server {
                 sendReply(exchange, 404, Page.NOT_FOUND, uri);
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();
-            printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
+            handleException("sending reply", ex);
         }
     }
     
@@ -232,7 +239,7 @@ public class Server {
                     try {
                         start = Integer.parseInt(matcher.group(1));
                         count = Integer.parseInt(matcher.group(2));
-                        printf("start: %d, count: %d%n", start, count);
+                        info("start: %d, count: %d%n", start, count);
                         if (start < 1) {
                             throw new NumberFormatException("spage < 1");
                         }
@@ -255,8 +262,7 @@ public class Server {
                 }
             }
         } catch (Throwable ex) {
-            ex.printStackTrace();
-            printf("%s sending reply: %s%n", ex.getClass().getSimpleName(), ex.getMessage());
+            handleException("sending reply", ex);
         }
     }
     
@@ -276,7 +282,7 @@ public class Server {
     }
     
     private void sendReply(HttpExchange exchange, int code, Page page, Object... args) throws IOException {
-        printf("sending reply %d %s%n", code, page.name());
+        info("sending reply %d %s%n", code, page.name());
         try {
             String reply = page.format(args);
             sendReply(exchange, code, reply);
@@ -297,9 +303,22 @@ public class Server {
     }
     
     private void printHandle(String prefix, HttpExchange exchange) {
-        printf("%s: %s %s (%s)%n", prefix, exchange.getRequestMethod(), exchange.getRequestURI(), exchange.getRemoteAddress());
+        info("%s: %s %s (%s)%n", prefix, exchange.getRequestMethod(), exchange.getRequestURI(), exchange.getRemoteAddress());
+    }
+    
+    private void handleException(String message, Throwable ex) {
+        ex.printStackTrace();
+        error("%s %s: %s%n", ex.getClass().getSimpleName(), message, ex.getMessage());
     }
 
+    private void info(String format, Object... args) {
+        printf("I  " + format, args);
+    }
+    
+    private void error(String format, Object... args) {
+        printf("%nE  " + format, args);
+    }
+    
     private void printf(String format, Object... args) {
         Runnable run = () -> {
             boolean atEnd;

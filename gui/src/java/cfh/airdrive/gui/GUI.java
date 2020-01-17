@@ -9,12 +9,13 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.ServiceLoader;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -62,6 +63,12 @@ public class GUI {
     private final JButton clearButton = new JButton();
     
     private final JTextArea output = new JTextArea();
+    
+    private final Pattern PAGE_RANGE = Pattern.compile(""
+            + "<b>START PAGE</b><br>"
+            + "<br>This sets the starting page of the download\\.<br>"
+            + "Range (\\d+)(?:\\.\\.\\.(\\d+))? ");
+
     
     
     private GUI() {
@@ -138,21 +145,48 @@ public class GUI {
     }
     
     private void doRefresh(ActionEvent ev) {
-        URL url;
-        try {
-            url = settings.downloadURL();
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-            handleException("loading download page", ex);
-            return;
-        }
-        SwingWorker<String, Void> worker = new 
-        
-        try (InputStream input = url.openStream()) {
-            // TODO
-        } catch (IOException ex) {
-            handleException("reading download page", ex);
-        }
+        enable(false);
+        pageCount.setText(null);
+        SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+                URL url = settings.downloadURL();
+                byte[] page = httpService.read(url);
+                info("Download page: %d bytes%n", page.length);
+                return new String(page, settings.charset());
+            }
+            @Override
+            protected void done() {
+                String body;
+                try {
+                    body = get();
+                } catch (InterruptedException ex) {
+                    handleException("reading download page", ex);
+                    return;
+                } catch (ExecutionException ex) {
+                    handleException("reading download page", ex.getCause());
+                    return;
+                }
+                Matcher matcher = PAGE_RANGE.matcher(body);
+                if (!matcher.find() || matcher.group(1) == null) {
+                    handleException("reading page range", new IOException("unrecognized page format"));
+                    return;
+                }
+                int first = Integer.parseInt(matcher.group(1));
+                int last;
+                info("first page: %d%n", first);
+                if (matcher.group(2) == null) {
+                    last = first;
+                } else {
+                    last = Integer.parseInt(matcher.group(2));
+                }
+                info("last page: %d%n", last);
+                pageCount.setText(Integer.toString(last-first+1));
+                // TODO
+                enable(true);
+            }
+        };
+        worker.execute();
     }
     
     private void handleException(String message, Throwable ex) {

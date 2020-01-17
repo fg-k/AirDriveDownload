@@ -31,7 +31,16 @@ public class Settings {
         return 20;
     }
 
-    public URL downloadURL() throws MalformedURLException {
-        return new URL("http://127.0.0.1:8000/download.html");
+    public URL downloadURL() {
+        try {
+            return new URL("http://127.0.0.1:8000/download.html");
+        } catch (MalformedURLException ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public String charset() {
+        return "UTF-8";
     }
 }

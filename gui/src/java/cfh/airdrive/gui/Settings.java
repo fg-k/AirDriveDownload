@@ -34,11 +34,12 @@ public class Settings {
     }
 
     public String downloadURL() {
-        return "http://127.0.0.1:8000/download.html";
+        return "http://192.168.4.1/download.html";
+//        return "http://127.0.0.1:8000/download.html";
     }
     
     public String actionURL() {
-        return "http://127.0.0.1:8000/download.html?spage=%d&npage=%d&action=download";
+        return downloadURL() + "?spage=%d&npage=%d&action=download";
     }
 
     public String charset() {

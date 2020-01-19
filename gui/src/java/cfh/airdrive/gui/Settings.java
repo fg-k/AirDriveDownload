@@ -1,8 +1,8 @@
 package cfh.airdrive.gui;
 
 import java.awt.Font;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.File;
+
 
 public class Settings {
 
@@ -11,6 +11,8 @@ public class Settings {
     public static Settings instance() {
         return instance;
     }
+
+    private File lastFile = new File("");
     
     private Settings() {
     }
@@ -31,16 +33,31 @@ public class Settings {
         return 20;
     }
 
-    public URL downloadURL() {
-        try {
-            return new URL("http://127.0.0.1:8000/download.html");
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
-            throw new RuntimeException(ex);
-        }
+    public String downloadURL() {
+        return "http://127.0.0.1:8000/download.html";
+    }
+    
+    public String actionURL() {
+        return "http://127.0.0.1:8000/download.html?spage=%d&npage=%d&action=download";
     }
 
     public String charset() {
         return "UTF-8";
+    }
+
+    public int maxPage() {
+        return 9_999;
+    }
+
+    public String spinnerFormat() {
+        return "#0";
+    }
+
+    public File lastFile() {
+        return lastFile ;
+    }
+
+    public void lastFile(File file) {
+        lastFile = file;
     }
 }

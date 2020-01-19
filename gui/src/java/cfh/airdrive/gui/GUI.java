@@ -8,10 +8,16 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -21,15 +27,19 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
+import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.event.ChangeEvent;
 import javax.swing.text.BadLocationException;
 
 import cfh.airdrive.http.HttpService;
@@ -59,7 +69,9 @@ public class GUI {
     private final JSpinner startPage = new JSpinner();
     private final JSpinner endPage = new JSpinner();
     private final JButton downloadButton = new JButton();
-    
+    private final SpinnerNumberModel startModel = new SpinnerNumberModel(1, 1, settings.maxPage(), 1);
+    private final SpinnerNumberModel endModel = new SpinnerNumberModel(settings.maxPage(), 1, settings.maxPage(), 1);
+
     private final JButton clearButton = new JButton();
     
     private final JTextArea output = new JTextArea();
@@ -97,17 +109,31 @@ public class GUI {
         refreshButton.setText("Refresh");
         refreshButton.addActionListener(this::doRefresh);
         
+        startModel.addChangeListener(this::doStart);
+        startPage.setModel(startModel);
+        startPage.setEditor(new JSpinner.NumberEditor(startPage, settings.spinnerFormat()));
+        
+        endPage.addChangeListener(this::doEnd);
+        endPage.setModel(endModel);
+        endPage.setEditor(new JSpinner.NumberEditor(endPage, settings.spinnerFormat()));
+        
+        downloadButton.setText("Download");
+        downloadButton.addActionListener(this::doDownload);
+        
         Insets insets = new Insets(2, 2, 2, 2);
         
-        JComponent refresh = createPanel("Refresh");
+        JComponent refresh = createTitledPanel("Refresh");
         refresh.setLayout(new GridBagLayout());
-        refresh.add(new JLabel("Pages:"), new GridBagConstraints(0,        0,        1, 1, 0.0, 0.0, BASELINE_TRAILING, NONE, insets, 0, 0));
-        refresh.add(pageCount,            new GridBagConstraints(RELATIVE, 0,        1, 1, 1.0, 0.0, BASELINE_LEADING,  NONE, insets, 0, 0));
-        refresh.add(refreshButton,        new GridBagConstraints(0,        RELATIVE, 2, 1, 1.0, 1.0, LAST_LINE_START,   NONE, insets, 0, 0));
+        addGridBag("Pages:", pageCount, refresh, 0, 0, insets);
+        addGridBag(refreshButton, refresh, 0, RELATIVE, insets);
         
-        JComponent download = createPanel("Download");
+        JComponent download = createTitledPanel("Download");
+        download.setLayout(new GridBagLayout());
+        addGridBag("Start: ", startPage, download, 0, 0, insets);
+        addGridBag("End: ", endPage, download, 0, RELATIVE, insets);
+        addGridBag(downloadButton, download, 0, RELATIVE, insets);
         
-        JComponent log = createPanel("Log");
+        JComponent log = createTitledPanel("Log");
         
         Box panel = Box.createHorizontalBox();
         panel.add(refresh);
@@ -128,13 +154,25 @@ public class GUI {
         frame.setLocationRelativeTo(null);  // TODO prefs
         frame.setVisible(true);
         
+        enable(false);
+        refreshButton.setEnabled(true);
+        
         info("HTTP service: %s%n", httpService.getClass().getSimpleName());
     }
     
-    private JComponent createPanel(String title) {
+    private JComponent createTitledPanel(String title) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(title));
         return panel;
+    }
+    
+    private void addGridBag(String title, JComponent comp, JComponent parent, int gridx, int gridy, Insets insets) {
+        parent.add(new JLabel(title), new GridBagConstraints(gridx,    gridy, 1, 1, 0.0, 0.0, BASELINE_TRAILING, NONE, insets, 0, 0));
+        parent.add(comp,              new GridBagConstraints(RELATIVE, gridy, REMAINDER, 1, 1.0, 0.0, BASELINE_LEADING,  NONE, insets, 0, 0));
+    }
+    
+    private void addGridBag(JComponent comp, JComponent parent, int gridx, int gridy, Insets insets) {
+        parent.add(comp, new GridBagConstraints(gridx, gridy, REMAINDER, 1, 1.0, 1.0, LAST_LINE_START, NONE, insets, 0, 0));
     }
     
     private void enable(boolean enabled) {
@@ -150,7 +188,7 @@ public class GUI {
         SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
             @Override
             protected String doInBackground() throws Exception {
-                URL url = settings.downloadURL();
+                URL url = new URL(settings.downloadURL());
                 byte[] page = httpService.read(url);
                 info("Download page: %d bytes%n", page.length);
                 return new String(page, settings.charset());
@@ -162,14 +200,17 @@ public class GUI {
                     body = get();
                 } catch (InterruptedException ex) {
                     handleException("reading download page", ex);
+                    enable(true);
                     return;
                 } catch (ExecutionException ex) {
                     handleException("reading download page", ex.getCause());
+                    enable(true);
                     return;
                 }
                 Matcher matcher = PAGE_RANGE.matcher(body);
                 if (!matcher.find() || matcher.group(1) == null) {
                     handleException("reading page range", new IOException("unrecognized page format"));
+                    enable(true);
                     return;
                 }
                 int first = Integer.parseInt(matcher.group(1));
@@ -182,7 +223,109 @@ public class GUI {
                 }
                 info("last page: %d%n", last);
                 pageCount.setText(Integer.toString(last-first+1));
-                // TODO
+                startModel.setValue(first);
+                startModel.setMinimum(first);
+                startModel.setMaximum(last);
+                endModel.setMinimum(first);
+                endModel.setMaximum(last);
+                endModel.setValue(last);
+                enable(true);
+            }
+        };
+        worker.execute();
+    }
+    
+    private void doStart(ChangeEvent ev) {
+        if (endModel.getNumber().intValue() < startModel.getNumber().intValue()) {
+            endModel.setValue(startModel.getValue());
+        }
+    }
+    
+    private void doEnd(ChangeEvent ev) {
+        if (startModel.getNumber().intValue() > endModel.getNumber().intValue()) {
+            startModel.setValue(endModel.getValue());
+        }
+    }
+    
+    private void doDownload(ActionEvent ev) {
+        int first = startModel.getNumber().intValue();
+        int last = endModel.getNumber().intValue();
+        info("Download pages %d to %d%n", first, last);
+
+        File lastFile = settings.lastFile();
+        JFileChooser chooser = new JFileChooser();
+        chooser.setAcceptAllFileFilterUsed(true);
+        chooser.setFileSelectionMode(chooser.FILES_ONLY);
+        chooser.setMultiSelectionEnabled(false);
+        chooser.setCurrentDirectory(lastFile.getAbsoluteFile().getParentFile());
+        chooser.setSelectedFile(lastFile);
+        if (chooser.showSaveDialog(frame) != chooser.APPROVE_OPTION) {
+            info("  canceled%n%n");
+            return;
+        }
+        File file = chooser.getSelectedFile();
+        settings.lastFile(file);
+        info("  selected %s%n", file.getAbsolutePath());
+        
+        if (file.exists()) {
+            Object message = new String[] {
+                file.getName(),
+                "File already exists.",
+                "Overwrite?"
+            };
+            if (showConfirmDialog(frame, message, "Confirm", YES_NO_OPTION) != YES_OPTION) {
+                info("  canceled%n%n");
+                return;
+            }
+        }
+        
+        enable(false);
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                if (file.exists()) {
+                    String name = file.getName();
+                    int index = name.lastIndexOf('.');
+                    if (index != -1) {
+                        name = name.substring(0, index);
+                    }
+                    File bak = new File(file.getParentFile(), name + ".bak");
+                    if (bak.exists()) {
+                        if (bak.delete()) {
+                            info("  deleted %s%n", bak);
+                        }
+                    }
+                    if (file.renameTo(bak)) {
+                        info("  %s renamed to %s%n", file, bak.getName());
+                    } else {
+                        throw new IOException("unable to rename " + file + " to " + bak.getName());
+                    }
+                }
+                
+                int total = 0;
+                try (OutputStream output = new FileOutputStream(file)) {
+                    for (int page = first; page <= last; ) {
+                        int count = Math.min(last-page+1, 5);;
+                        info("  page %d - %d%n", page, page+count-1);
+                        URL url = new URL(String.format(settings.actionURL(), page, count));
+                        byte[] data = httpService.read(url);
+                        total += data.length;
+                        output.write(data);
+                        page += count;
+                    }
+                }
+                info("  %d bytes saved%n", total);
+                return null;
+            }
+            @Override
+            protected void done() {
+                try {
+                    get();
+                } catch (InterruptedException ex) {
+                    handleException("downloading data", ex);
+                } catch (ExecutionException ex) {
+                    handleException("downloading data", ex.getCause());
+                }
                 enable(true);
             }
         };

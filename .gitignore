@@ -1,6 +1,7 @@
 /.metadata/
 */.settings/
 */build/
+*/dist/
 *.swp
 *~
 *.bak

@@ -11,5 +11,6 @@
     </listAttribute>
     <booleanAttribute key="org.eclipse.jdt.launching.ATTR_EXCLUDE_TEST_CODE" value="true"/>
     <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="cfh.airdrive.gui.GUI"/>
+    <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="${string_prompt}"/>
     <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="gui"/>
 </launchConfiguration>

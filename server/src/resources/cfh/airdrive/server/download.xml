@@ -4,58 +4,6 @@
 <title>AirDrive - Download</title>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="title" content="AirDrive">
-<style type="text/css">
-body, table {
-font-family: Verdana, Arial, Helvetica, sans-serif; 
-background-color: #474747;
-color: #FFFFFF;
-text-align:center; 
-word-wrap: break-word;
-table-layout: fixed; 
-}
-#container {
-height: 100%%;
-width: 100%%;
-}
-#row0 {
-background: #474747;
-font-size: 60px;
-height: 150px;
-}
-#row1 {
-background: #7d7d7d;
-font-size: 30px;
-}
-#row2 {
-background: #474747;
-font-size: 45px;
-height: 120px;
-}
-#row3 {
-background: #7d7d7d;
-font-size: 45px;
-height: 120px;
-}
-input {
-font-family:Verdana, Arial, Helvetica, sans-serif;
-font-size: 30px;
-color: #000000;
-text-align:center;
-width: 80%%;
-}
-input.checkbox
-{
-width: 30px;
-height: 30px;
-}
-select
-{
-font-size: 30px;
-}
-b {
-color: #faffbe;
-}
-</style>
 </head>
 <body>
 <table class="center" id="container">

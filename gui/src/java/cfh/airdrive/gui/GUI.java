@@ -10,14 +10,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -33,7 +30,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
-import javax.swing.JSpinner.NumberEditor;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -48,6 +44,9 @@ import cfh.airdrive.http.HttpService;
 public class GUI {
 
     public static void main(String[] args) {
+        if (args.length > 0) {
+            Settings.baseURL(args[0]);
+        }
         try {
             new GUI();
         } catch (Exception ex) {
@@ -80,7 +79,6 @@ public class GUI {
             + "<b>START PAGE</b><br>"
             + "<br>This sets the starting page of the download\\.<br>"
             + "Range (\\d+)(?:\\.\\.\\.(\\d+))? ");
-
     
     
     private GUI() {

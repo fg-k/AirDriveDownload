@@ -6,7 +6,13 @@ import java.io.File;
 
 public class Settings {
 
+    private static String base = "http://192.168.4.1";
     private static final Settings instance = new Settings();
+    
+
+    public static void baseURL(String base) {
+        Settings.base = base;
+    }
     
     public static Settings instance() {
         return instance;
@@ -34,8 +40,7 @@ public class Settings {
     }
 
     public String downloadURL() {
-        return "http://192.168.4.1/download.html";
-//        return "http://127.0.0.1:8000/download.html";
+        return base + "/download.html";
     }
     
     public String actionURL() {

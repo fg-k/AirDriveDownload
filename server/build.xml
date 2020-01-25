@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Server" default="compile">
+    <description>
+        Create test server.
+    </description>
+    
+    <property name="src"   location="src"/>
+    <property name="java"  location="${src}/java"/>
+    <property name="rsrc"  location="${src}/resources"/>
+    <property name="build" location="build"/>
+    <property name="dist"  location="dist"/>
+    
+    <property name="debug" value="true"/>
+    <property name="level" value="lines,vars,source"/>
+    <property name="deprecation" value="true"/>
+    <property name="verbose" value="true"/>
+    
+    <target name="init">
+        <tstamp/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${dist}"/>
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac
+            srcdir="${java}"
+            destdir="${build}" 
+            debug="${debug}"
+            debuglevel="${level}"
+            deprecation="${deprecation}"
+            verbose="${verbose}"
+            includeantruntime="false">
+        </javac>
+    </target>
+    
+    <target name="resources" depends="init">
+        <copy todir="${build}">
+            <fileset dir="${rsrc}"/>
+        </copy>
+    </target>
+    
+    <target name="jar" depends="compile,resources">
+        <jar destfile="${dist}/server.jar" basedir="${build}" manifest="${src}/manifest.txt"></jar>
+    </target>
+    
+    <target name="clean">
+        <delete includeemptydirs="true">
+            <fileset dir="${build}" includes="**/*"/>
+        </delete>
+        <delete includeemptydirs="true">
+            <fileset dir="${dist}" includes="**/*"/>
+        </delete>
+    </target>
+</project>

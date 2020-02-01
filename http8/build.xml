@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Server" default="dist">
+<project name="http8" default="dist">
     <description>
-        Create test server.
+        Create HTTP client for Java 8.
     </description>
     
     <property name="src"   location="src"/>
     <property name="java"  location="${src}/java"/>
-    <property name="rsrc"  location="${src}/resources"/>
     <property name="build" location="build"/>
+    <property name="meta"  location="META-INF"/>
     <property name="dist"  location="dist"/>
-    <property name="jar"   value="server.jar"/>
-    
+    <property name="jar"   value="http8.jar"/>
+
     <property name="version" value="8"/>
     <property name="debug" value="true"/>
     <property name="level" value="lines,vars,source"/>
@@ -27,6 +27,7 @@
         <javac
             srcdir="${java}"
             destdir="${build}"
+            classpath="../gui/build/"
             source="${version}"
             target="${version}"
             debug="${debug}"
@@ -38,18 +39,13 @@
         </javac>
     </target>
     
-    <target name="resources" depends="init">
-        <copy todir="${build}">
-            <fileset dir="${rsrc}"/>
-        </copy>
-    </target>
-    
-    <target name="dist" depends="compile,resources">
+    <target name="dist" depends="compile">
         <jar 
             destfile="${dist}/${jar}" 
             basedir="${build}" 
             manifest="${src}/manifest.txt"
             >
+            <metainf dir="${meta}"/>
         </jar>
     </target>
     

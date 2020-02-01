@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Server" default="dist">
+<project name="GUI" default="dist">
     <description>
-        Create test server.
+        Create HTTP client for Java 8.
     </description>
     
     <property name="src"   location="src"/>
     <property name="java"  location="${src}/java"/>
-    <property name="rsrc"  location="${src}/resources"/>
     <property name="build" location="build"/>
+    <property name="http"  location="../http8"/>
     <property name="dist"  location="dist"/>
-    <property name="jar"   value="server.jar"/>
-    
+    <property name="jar"   value="AirDrive.jar"/>
+
     <property name="version" value="8"/>
     <property name="debug" value="true"/>
     <property name="level" value="lines,vars,source"/>
@@ -27,6 +27,7 @@
         <javac
             srcdir="${java}"
             destdir="${build}"
+            classpath="../gui/build/"
             source="${version}"
             target="${version}"
             debug="${debug}"
@@ -38,19 +39,20 @@
         </javac>
     </target>
     
-    <target name="resources" depends="init">
-        <copy todir="${build}">
-            <fileset dir="${rsrc}"/>
-        </copy>
+    <target name="http8" depends="init">
+        <ant dir="${http}" inheritall="false"/>
     </target>
     
-    <target name="dist" depends="compile,resources">
+    <target name="dist" depends="compile,http8">
         <jar 
             destfile="${dist}/${jar}" 
             basedir="${build}" 
             manifest="${src}/manifest.txt"
             >
         </jar>
+        <copy todir="${dist}">
+            <fileset dir="${http}/dist"/>
+        </copy>
     </target>
     
     <target name="clean">

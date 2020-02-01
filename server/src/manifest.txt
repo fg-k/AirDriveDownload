@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Main-Class: cfh.airdrive.server.Server
 Implementation-Name: AirDriveDownloader Test Server
 Implementation-Version: 1.0
 Implementation-Vendor: CFH
+Main-Class: cfh.airdrive.server.Server

@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Implementation-Name: AirDrive Downloader
+Implementation-Version: 0.0
+Implementation-Vendor: CFH
+Main-Class: cfh.airdrive.gui.GUI
+Class-Path: ./http8.jar

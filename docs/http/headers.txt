@@ -1,0 +1,44 @@
+=====  START  =====
+
+
+REQUEST
+Host: 192.168.4.1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,de-DE;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+
+REPLY
+Accept-Ranges: bytes
+Connection: close
+Content-Length: 2313
+Content-Type: text/html
+Server: lwIP/1.4.0
+
+
+=====  DOWNLOAD  =====
+
+
+REQUEST
+Host: 192.168.4.1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:52.0) Gecko/20100101 Firefox/52.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,de-DE;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Referer: http://192.168.4.1/download.html
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+
+REPLY
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Content-Disposition: attachment; filename=LOG.TXT
+Content-Length: 10240
+Content-Transfer-Encoding: binary
+Content-Type: application/force-download
+Expires: 0
+Pragma: public, no-cache
+

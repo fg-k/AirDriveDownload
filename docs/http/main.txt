@@ -1,0 +1,59 @@
+=====  MAIN PAGE  =====
+
+
+GET http://192.168.4.1/
+
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>AirDrive - Data Log</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="title" content="AirDrive">
+<style type="text/css">
+body, table {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+background-color: #474747;
+color: #FFFFFF;
+text-align:center; 
+word-wrap: break-word;
+table-layout: fixed; 
+}
+#container {
+height: 100%;
+width: 100%;
+}
+#row0 {
+background: #474747;
+font-size: 60px;
+height: 150px;
+}
+#row1 {
+background: #7d7d7d;
+font-size: 30px;
+}
+#row2 {
+background: #474747;
+font-size: 45px;
+height: 120px;
+}
+#row3 {
+background: #7d7d7d;
+font-size: 45px;
+height: 120px;
+}
+b {
+color: #272727;
+}
+</style>
+</head>
+<body>
+<table class="center" id="container">
+<tr id="row0"><td>AirDrive Data Log</td></tr>
+<tr id="row1"><td>79007300740125007070149015110392<br>001459482905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511038B<br>001500002905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX00790073007401250000004000490740741170701490151103A4<br>001500162905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511039D<br>001500322905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511039F<br>001500482905072003007123-02000000-153037016CHT00074CHT00074N/AXXXXX0079007300740125000000400049074074117070149015110398<br>001501002905072003007123-01000000-153037016CHT00074CHT00074N/AXXXXX00790073007401250000004000490740741170701490151103A4<br>001501162905072003007123-01000000-153037016CHT00074CHT00074N/AXXXXX007900730074012500000040004907407411707014901511039D<br>00150132...
+<tr id="row2"><td>Page: 212        / 212        <br><a href="index.html?page=1">&laquo; First</a> &nbsp; <a href="index.html?page=211       ">&lsaquo; Previous</a> &nbsp;&nbsp; <a href="index.html?page=212       ">Next &rsaquo;</a> &nbsp; <a href="index.html?page=212        ">Last &raquo;</a></td></tr>
+<tr id="row3"><td><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="settings.html">Settings</a></td></tr>
+</table>
+</body>
+</html>
+

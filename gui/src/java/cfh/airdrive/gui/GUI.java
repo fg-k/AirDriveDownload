@@ -150,12 +150,21 @@ public class GUI {
         frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
         frame.pack();  // TODO prefs
         frame.setLocationRelativeTo(null);  // TODO prefs
+        frame.setTitle(String.format("AirDrive Downloader %s - ©CFH",
+                getClass().getPackage().getImplementationVersion()
+                )); 
         frame.setVisible(true);
         
         enable(false);
         refreshButton.setEnabled(true);
         
-        info("HTTP service: %s%n", httpService.getClass().getSimpleName());
+        Package servicePackage = httpService.getClass().getPackage();
+        String serviceTitle = servicePackage.getImplementationTitle();
+        if (serviceTitle == null) {
+            info("HTTP service: %s%n", httpService.getClass().getSimpleName());
+        } else {
+            info("HTTP service: %s %s%n", serviceTitle, servicePackage.getImplementationVersion());
+        }
     }
     
     private JComponent createTitledPanel(String title) {

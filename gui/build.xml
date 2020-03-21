@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="GUI" default="dist">
     <description>
-        Create HTTP client for Java 8.
+        AirDrive Downloader.
     </description>
     
     <property name="src"   location="src"/>

@@ -15,3 +15,19 @@ Download and installation instructions can be found in the [Releases section](ht
 5. press `Download` and select destination file.
 
 
+
+
+Issues and sugestions can be reported at the [Issues section](https://github.com/Heuberger/AirDriveDownload/issues).
+
+## History
+
+### GUI
+
+* `1.0.0` - initial release
+  - added title to main frame (#10)
+
+### HTTP8
+
+* `1.0.0` - initial release
+
+

@@ -1,16 +1,12 @@
 # AirDriveDownload
 
-Download log data from the [AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
+Download log data from a[AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
 
-The logger's user interface only allows downloading a file with a maximum of 5 pages with 2kB each. The downloaded files must also be joined manually. To This application connects to the logger and download all (selected) pages to one file.
-
-Main page: https://heuberger.github.io/AirdDriveDownload 
-
------
-
-## Development
+Main page: [heuberger.github.io/AirdDriveDownload](https://heuberger.github.io/AirdDriveDownload). 
 
 This is an Eclipse workspace for Java version 8.
+
+## Projects
 
 ### `gui`
 
@@ -22,5 +18,26 @@ HTTP-Service using the Java 8.
 
 ### `server`
 
-An HTTP server to emulate the logger for testing.
+An HTTP server to emulate the logger for developing/testing.
+
+Documents
+---
+
+### Download Samples
+
+* [LOG1.TXT](docs/data/LOG1.TXT) - page 1
+* [LOG2.TXT](docs/data/LOG2.TXT) - page 2
+* [LOG1-5.TXT](docs/data/LOG1-5.TXT) - pages 1-5
+
+### HTTP Samples
+
+* [headers.txt](docs/data/headers.txt) - request and reply headers
+* [main.txt](docs/http/main.txt) - main page
+* [first.txt](docs/http/first.txt) - log page 1
+* [download.txt](docs/http/download.txt) - download page
+* [action15.txt](docs/http/action15.txt) - download action pages 1-5
+
+### Data Fields
+
+* [fields.html](docs/data/fields.html) ([field.ods](docs/data/fields.ods))
 

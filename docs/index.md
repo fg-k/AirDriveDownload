@@ -1,21 +1,17 @@
-## Index
+# AirDrive Downloader
 
-### Download Samples
+Download log data from the [AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
 
-* [LOG1.TXT](data/LOG1.TXT) - page 1
-* [LOG2.TXT](data/LOG2.TXT) - page 2
-* [LOG1-5.TXT](data/LOG1-5.TXT) - pages 1-5
+The logger's user interface only allows downloading a file with a maximum of 5 pages with 2kB each. The downloaded files must also be joined manually. This application connects to the logger and download all, or a selected range of pages to one text file.
 
+## Usage
 
-### HTTP Samples
+Download and installation instructions can be found in the [Releases section](https://github.com/Heuberger/AirDriveDownload/releases).
 
-* [headers.txt](data/headers.txt) - request and reply headers
-* [main.txt](http/main.txt) - main page
-* [first.txt](http/first.txt) - log page 1
-* [download.txt](http/download.txt) - download page
-* [action15.txt](http/action15.txt) - download action pages 1-5
+1. connect the computer to the AirDrive Wi-Fi;
+2. start the application;
+3. press  the`Refresh`button to load page range;
+4. select page range to download (all selected by default);
+5. press `Download` and select destination file.
 
-### Data Fields
-
-* [fields.html](data/fields.html) ([fields.ods](data/fields.ods)) - Field description
 

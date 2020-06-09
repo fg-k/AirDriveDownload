@@ -1,0 +1,5 @@
+=====  ERASE  =====
+
+
+GET http://192.168.4.1/index.html?action=erase
+

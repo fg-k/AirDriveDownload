@@ -14,7 +14,7 @@ public class Settings {
     }
 
     public String title() {
-        return "Test Server - 1.0";
+        return "Test Server 1.1.0 - ©CFH";
     }
 
     public int outputColumns() {

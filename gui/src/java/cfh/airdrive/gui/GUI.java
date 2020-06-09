@@ -27,6 +27,7 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -327,7 +328,9 @@ public class GUI {
     }
     
     private void doErase(ActionEvent ev) {
-        // TODO confirm
+        int opt = showConfirmDialog(frame, "Erase the entire data log?", "AirDrive - Erase Log", OK_CANCEL_OPTION);
+        if (opt != OK_OPTION) 
+            return;
         enable(false);
         pageCount.setText(null);
         SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
@@ -360,10 +363,10 @@ public class GUI {
     }
     
     private void parseDownloadPage(String body) {
+        enable(false);
         String count = "empty";
         int first = 1;
         int last = settings.maxPage();
-        enable(false);
         try {
             if (!PAGE_EMPTY.matcher(body).find()) {
                 Matcher matcher = PAGE_RANGE.matcher(body);
@@ -389,6 +392,7 @@ public class GUI {
             endModel.setMinimum(first);
             endModel.setMaximum(last);
             endModel.setValue(last);
+            eraseButton.setEnabled(true);
         } finally {
             refreshButton.setEnabled(true);
         }

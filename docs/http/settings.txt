@@ -1,0 +1,108 @@
+=====  SETTINGS  =====
+
+GET http://192.168.4.1/settings.html
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>AirDrive - Settings</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="title" content="AirDrive">
+<style type="text/css">
+body, table {
+font-family: Verdana, Arial, Helvetica, sans-serif; 
+background-color: #474747;
+color: #FFFFFF;
+text-align:center; 
+word-wrap: break-word;
+table-layout: fixed; 
+}
+#container {
+height: 100%;
+width: 100%;
+}
+#row0 {
+background: #474747;
+font-size: 60px;
+height: 150px;
+}
+#row1 {
+background: #7d7d7d;
+font-size: 30px;
+}
+#row2 {
+background: #474747;
+font-size: 45px;
+height: 120px;
+}
+#row3 {
+background: #7d7d7d;
+font-size: 45px;
+height: 120px;
+}
+input {
+font-family:Verdana, Arial, Helvetica, sans-serif;
+font-size: 30px;
+color: #000000;
+text-align:center;
+width: 80%;
+}
+input.checkbox
+{
+width: 30px;
+height: 30px;
+}
+select
+{
+font-size: 30px;
+}
+b {
+color: #faffbe;
+}
+</style>
+</head>
+<body>
+<table class="center" id="container">
+<tr id="row0"><td colspan="2">Settings - Access Point</td></tr>
+<tr id="row1"><td><form action="settings.html" method="GET"><br><b>ACCESS POINT NAME (SSID)</b><br><br>The Wi-Fi network name is a required setting. Case sensitive, max 30 chars.</td><td><input type="text" name="nname" maxlength="30" value="AIR_D_MMES"                     ></td></tr>
+
+<tr id="row1"><td><br><b>ACCESS POINT SECURITY</b><br><br>This sets the network security type. For WEP/WPA/WPA2 setting a password is necessary.</td><td><select name="secur"><option value="0" selected>Open network</option><option value="1"         >WEP</option><option value="2"         >WPA-PSK</option><option value="3"         >WPA2-PSK</option><option value="4"         >WPA-PSK / WPA2-PSK</option></td></tr>
+
+<tr id="row1"><td><br><b>ACCESS POINT PASSWORD</b><br><br>Password for secure networks. Case sensitive, minimum 8 chars, max 30 chars.</td><td><input type="text" name="pword" maxlength="30" value=""                               ></td></tr>
+
+<tr id="row1"><td><br><b>ACCESS POINT HIDDEN</b><br><br>Hides the network. You will need to enter the SSID manually to connect. Be careful with this setting!</td><td><input type="checkbox" name="hiddn" class="checkbox" value="yes"         ></td></tr>
+
+<!--<tr id="row1"><td><br><b>ACCESS POINT CHANNEL</b><br><br>This sets the wireless network channel. Note: channels 12 and 13 are not FCC-approved.</td><td><select name="chnnl"><option value="0" $chnnl00>1</option><option value="1" $chnnl01>2</option><option value="2" $chnnl02>3</option><option value="3" $chnnl03>4</option><option value="4" $chnnl04>5</option><option value="5" $chnnl05>6</option><option value="6" $chnnl06>7</option><option value="7" $chnnl07>8</option><option value="8" $chnnl08>9</option><option value="9" $chnnl09>10</option><option value="10" $chnnl10>11</option><option value="11" $chnnl11>12</option><option value="12" $chnnl12>13</option></select></td></tr>-->
+
+<tr id="row1"><td colspan="2"><font color="yellow"><br><b>IMPORTANT WARNING</b><br><br>MEMORIZE THE NETWORK NAME AND PASSWORD,<br>OTHERWISE ACCESS TO DEVICE WILL BE IMPOSSIBLE!<br><br></font></td></tr>
+
+<tr id="row2"><td colspan="2"><input type="hidden" name="action" value="save1"><input type="submit" value="Save Access Point settings"></form></td></tr><tr id="row0"><td colspan="2">Settings - Serial Logging</td></tr>
+
+<tr id="row1"><td><form action="settings.html" method="GET"><br><b>BAUDRATE</b><br><br>This sets the baudrate used on the serial bus.</td><td><select name="brate"><option value="0"         >300 kbps</option><option value="1"         >600 kbps</option><option value="2"         >1200 kbps</option><option value="3"         >2400 kbps</option><option value="4"         >4800 kbps</option><option value="5"         >9600 kbps</option><option value="6"         >14400 kbps</option><option value="7"         >19200 kbps</option><option value="8"         >38400 kbps</option><option value="9"         >56000 kbps</option><option value="10"         >57600 kbps</option><option value="11" selected>115200 kbps</option></select></td></tr>
+
+<tr id="row1"><td><br><b>BITS</b><br><br>This sets the number of bits used on the serial bus.</td><td><select name="nbits"><option value="0"         >5 bits</option><option value="1"         >6 bits</option><option value="2"         >7 bits</option><option value="3" selected>8 bits</option></select></td></tr>
+
+<tr id="row1"><td><br><b>STOP BITS</b><br><br>This sets the number of stop bits used on the serial bus.</td><td><select name="stbit"><option value="0" selected>1 stop bits</option><option value="1"         >2 stop bits</option></select></td></tr>
+
+<tr id="row1"><td><br><b>PARITY</b><br><br>This sets the parity bit type used on the serial bus.</td><td><select name="parit"><option value="0"         >Even parity</option><option value="1"         >Odd parity</option><option value="2" selected>No parity</option></select></td></tr>
+
+<tr id="row1"><td><br><b>LOG MODE</b><br><br>This sets the format in which logged data is stored.</td><td><select name="lmode"><option value="0" selected>Binary</option><option value="1"         >Hexadecimal</option><option value="2"         >Decimal</option></select></td></tr>
+
+<tr id="row1"><td><br><b>CHARACTER SEPARATOR</b><br><br>This sets the separator between logged characters.</td><td><select name="chsep"><option value="0" selected>None</option><option value="1"         >Space</option><option value="2"         >Comma</option><option value="3"         >Tabulator</option><option value="4"         >New line</option></td></tr>
+
+<tr id="row1"><td><br><b>STREAM SEPARATOR</b><br><br>This sets the separator upon stream change.</td><td><select name="stsep"><option value="0"         >None</option><option value="1"         >Space</option><option value="2"         >Comma</option><option value="3"         >Tabulator</option><option value="4" selected>New line</option></td></tr>
+
+<tr id="row1"><td><br><b>LOG STREAM</b><br><br>This sets which streams get logged.</td><td><select name="lstrm"><option value="0"         >Both RX and TX</option><option value="1"         >Only TX</option><option value="2" selected>Only RX</option></td></tr>
+
+<tr id="row1"><td><br><b>STREAM MARKERS</b><br><br>This sets whether a stream change gets designated by a marker.</td><td><input type="checkbox" name="smark" class="checkbox" value="yes"         ></td></tr>
+
+<tr id="row1"><td><br><b>DISABLE LOGGING</b><br><br>This sets whether data logging is disabled completely.</td><td><input type="checkbox" name="dslog" class="checkbox" value="yes"         ></td></tr>
+
+<tr id="row2"><td colspan="2"><input type="hidden" name="action" value="save2"><input type="submit" value="Save data logging settings"></form></td></tr>
+
+<tr id="row2"><td colspan="2"><form action="confirm.html" method="GET"><input type="submit" value="Erase log"></form></td></tr>
+<tr id="row2"><td colspan="2"><form action="settings.html" method="GET"><input type="hidden" name="action" value="toggle"><input type="submit" value="Toggle Keyboard &hArr; Flash Drive" disabled></form></td></tr>
+<tr id="row3"><td colspan="2"><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="advanced.html">Advanced</a></td></tr>
+</table>
+</body>
+</html>

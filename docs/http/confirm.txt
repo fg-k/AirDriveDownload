@@ -1,13 +1,12 @@
-=====  ERASE  =====
+=====  CONFIRM  =====
 
-
-GET http://192.168.4.1/index.html?action=erase
+GET http://192.168.4.1/confirm.html
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>AirDrive - Data Log</title>
+<title>AirDrive - Erase Log</title>
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <meta name="title" content="AirDrive">
 <style type="text/css">
@@ -42,17 +41,24 @@ background: #7d7d7d;
 font-size: 45px;
 height: 120px;
 }
-b {
-color: #272727;
+input {
+font-family:Verdana, Arial, Helvetica, sans-serif;
+font-size: 30px;
+color: #000000;
+text-align:center;
+width: 80%;
+}
+input.checkbox
+{
+width: 30px;
+height: 30px;
 }
 </style>
 </head>
 <body>
 <table class="center" id="container">
-<tr id="row0"><td>AirDrive Data Log</td></tr>
-<tr id="row1"><td>
-<b>The data log is empty.</b>
-</td></tr>
+<tr id="row0"><td>AirDrive - Erase Log</td></tr>
+<tr id="row1"><td>Are you sure you want to erase the entire data log?<br><br><br><form action="index.html" method="GET"><input type="hidden" name="action" value="erase"><input type="submit" value="Yes, erase the entire log!"></form></td></tr>
 <tr id="row2"><td>&nbsp;</td></tr>
 <tr id="row3"><td><a href="index.html">Data Log</a> &nbsp;&nbsp; <a href="download.html">Download</a> &nbsp;&nbsp; <a href="settings.html">Settings</a></td></tr>
 </table>

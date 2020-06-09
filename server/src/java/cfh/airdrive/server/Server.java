@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.ArrayList;
@@ -78,7 +79,10 @@ public class Server {
         INVALID_METHOD("405.xml"),
         INTERNAL_ERROR("500.xml"),
         ROOT("root.xml"),
-        DOWNLOAD("download.xml");
+        DOWNLOAD("download.xml"),
+        SETTINGS("settings.xml"),
+        CONFIRM("confirm.xml"),
+        EMPTY("empty.xml");
         
         private static final Map<Page, String> cache = new HashMap<>();
         
@@ -203,20 +207,31 @@ public class Server {
     private void handleRoot(HttpExchange exchange) {
         printHandle("Root", exchange);
         URI uri = exchange.getRequestURI();
+        printUri(uri);
         try {
             if (!exchange.getRequestMethod().equals("GET")) {
                 sendReply(exchange, 405, Page.INVALID_METHOD, exchange.getRequestMethod(), uri);
-            } else if (roots.contains(uri.getPath().toLowerCase()) &&
-                    uri.getQuery() == null) {
-                info("sending 200 ROOT%n");
-                String data = pages.get(pages.size()-1);
-                if (data.length() > settings.preview()) {
-                    data = data.substring(0, settings.preview()) + "...";
+            } else if (roots.contains(uri.getPath().toLowerCase())) {
+                if (uri.getQuery() == null) {
+                    info("sending 200 ROOT%n");
+                    String data = pages.get(pages.size()-1);
+                    if (data.length() > settings.preview()) {
+                        data = data.substring(0, settings.preview()) + "...";
+                    }
+                    data = data.replace("\n", "<br>");
+                    sendReply(exchange, 200, Page.ROOT, data, pages.size());
+                } else if (uri.getQuery().equals("action=erase")) {
+                    info("sending 200 EMPTY%n");
+                    sendReply(exchange, 200, Page.EMPTY);
+                } else {
+                    sendReply(exchange, 400, Page.BAD_REQUEST, uri);
                 }
-                data = data.replace("\n", "<br>");
-                sendReply(exchange, 200, Page.ROOT, data, pages.size());
             } else if (uri.getPath().equalsIgnoreCase("/download.html")) {
                 handleDownload(exchange);
+            } else if (uri.getPath().equalsIgnoreCase("/settings.html")) {
+                handleSettings(exchange);
+            } else if (uri.getPath().equalsIgnoreCase("/confirm.html")) {
+                handleConfirm(exchange);
             } else {
                 sendReply(exchange, 404, Page.NOT_FOUND, uri);
             }
@@ -228,6 +243,7 @@ public class Server {
     private void handleDownload(HttpExchange exchange) {
         printHandle("Download", exchange);
         URI uri = exchange.getRequestURI();
+        printUri(uri);
         try {
             if (uri.getQuery() == null) {
                 sendReply(exchange, 200, Page.DOWNLOAD, 1, pages.size(), Math.min(pages.size(), settings.maxPages()));
@@ -260,6 +276,36 @@ public class Server {
                 } else {
                     sendReply(exchange, 400, Page.BAD_REQUEST, uri);
                 }
+            }
+        } catch (Throwable ex) {
+            handleException("sending reply", ex);
+        }
+    }
+    
+    private void handleSettings(HttpExchange exchange) {
+        printHandle("Settings", exchange);
+        URI uri = exchange.getRequestURI();
+        printUri(uri);
+        try {
+            if (uri.getQuery() == null) {
+                sendReply(exchange, 200, Page.SETTINGS);
+            } else {
+                sendReply(exchange, 400, Page.BAD_REQUEST, uri);
+            }
+        } catch (Throwable ex) {
+            handleException("sending reply", ex);
+        }
+    }
+    
+    private void handleConfirm(HttpExchange exchange) {
+        printHandle("Confirm", exchange);
+        URI uri = exchange.getRequestURI();
+        printUri(uri);
+        try {
+            if (uri.getQuery() == null) {
+                sendReply(exchange, 200, Page.CONFIRM);
+            } else {
+                sendReply(exchange, 400, Page.BAD_REQUEST, uri);
             }
         } catch (Throwable ex) {
             handleException("sending reply", ex);
@@ -309,6 +355,20 @@ public class Server {
     private void handleException(String message, Throwable ex) {
         ex.printStackTrace();
         error("%s %s: %s%n", ex.getClass().getSimpleName(), message, ex.getMessage());
+    }
+    
+    private void printUri(URI uri) {
+        String text = uri.toString() + "%n";
+        for (Method method : URI.class.getDeclaredMethods()) {
+            if (method.getName().startsWith("get") && method.getParameterCount() == 0) {
+                try {
+                    text = String.format("%s     %s: %s%n", text, method.getName(), method.invoke(uri));
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+        info(text);
     }
 
     private void info(String format, Object... args) {

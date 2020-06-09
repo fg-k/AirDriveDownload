@@ -6,12 +6,16 @@ import java.io.File;
 
 public class Settings {
 
-    private static String base = "http://192.168.4.1";
+    private static String base = "http://192.168.4.1/";
     private static final Settings instance = new Settings();
     
 
     public static void baseURL(String base) {
-        Settings.base = base;
+        if (base.endsWith("/")) {
+            Settings.base = base;
+        } else {
+            Settings.base = base + "/";
+        }
     }
     
     public static Settings instance() {
@@ -40,11 +44,15 @@ public class Settings {
     }
 
     public String downloadURL() {
-        return base + "/download.html";
+        return base + "download.html";
     }
     
     public String actionURL() {
         return downloadURL() + "?spage=%d&npage=%d&action=download";
+    }
+    
+    public String eraseURL() {
+        return base + "?action=erase";
     }
 
     public String charset() {

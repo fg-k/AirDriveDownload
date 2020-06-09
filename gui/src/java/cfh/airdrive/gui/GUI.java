@@ -71,10 +71,11 @@ public class GUI {
     private final SpinnerNumberModel startModel = new SpinnerNumberModel(1, 1, settings.maxPage(), 1);
     private final SpinnerNumberModel endModel = new SpinnerNumberModel(settings.maxPage(), 1, settings.maxPage(), 1);
 
-    private final JButton clearButton = new JButton();
+    private final JButton eraseButton = new JButton();
     
     private final JTextArea output = new JTextArea();
     
+    private final Pattern PAGE_EMPTY = Pattern.compile("<b>The data log is empty.</b>");
     private final Pattern PAGE_RANGE = Pattern.compile(""
             + "<b>START PAGE</b><br>"
             + "<br>This sets the starting page of the download\\.<br>"
@@ -118,6 +119,9 @@ public class GUI {
         downloadButton.setText("Download");
         downloadButton.addActionListener(this::doDownload);
         
+        eraseButton.setText("Erase");
+        eraseButton.addActionListener(this::doErase);
+        
         Insets insets = new Insets(2, 2, 2, 2);
         
         JComponent refresh = createTitledPanel("Refresh");
@@ -132,6 +136,8 @@ public class GUI {
         addGridBag(downloadButton, download, 0, RELATIVE, insets);
         
         JComponent log = createTitledPanel("Log");
+        log.setLayout(new GridBagLayout());
+        addGridBag(eraseButton, log, 0, RELATIVE, insets);
         
         Box panel = Box.createHorizontalBox();
         panel.add(refresh);
@@ -187,6 +193,7 @@ public class GUI {
         startPage.setEnabled(enabled);
         endPage.setEnabled(enabled);
         downloadButton.setEnabled(enabled);
+        eraseButton.setEnabled(enabled);
     }
     
     private void doRefresh(ActionEvent ev) {
@@ -196,8 +203,9 @@ public class GUI {
             @Override
             protected String doInBackground() throws Exception {
                 URL url = new URL(settings.downloadURL());
+                info("URL: %s%n", url);
                 byte[] page = httpService.read(url);
-                info("Download page: %d bytes%n", page.length);
+                info("Got download page: %d bytes%n", page.length);
                 return new String(page, settings.charset());
             }
             @Override
@@ -207,36 +215,14 @@ public class GUI {
                     body = get();
                 } catch (InterruptedException ex) {
                     handleException("reading download page", ex);
-                    enable(true);
+                    refreshButton.setEnabled(true);
                     return;
                 } catch (ExecutionException ex) {
                     handleException("reading download page", ex.getCause());
-                    enable(true);
+                    refreshButton.setEnabled(true);
                     return;
                 }
-                Matcher matcher = PAGE_RANGE.matcher(body);
-                if (!matcher.find() || matcher.group(1) == null) {
-                    handleException("reading page range", new IOException("unrecognized page format"));
-                    enable(true);
-                    return;
-                }
-                int first = Integer.parseInt(matcher.group(1));
-                int last;
-                info("first page: %d%n", first);
-                if (matcher.group(2) == null) {
-                    last = first;
-                } else {
-                    last = Integer.parseInt(matcher.group(2));
-                }
-                info("last page: %d%n", last);
-                pageCount.setText(Integer.toString(last-first+1));
-                startModel.setValue(first);
-                startModel.setMinimum(first);
-                startModel.setMaximum(last);
-                endModel.setMinimum(first);
-                endModel.setMaximum(last);
-                endModel.setValue(last);
-                enable(true);
+                parseDownloadPage(body);
             }
         };
         worker.execute();
@@ -332,11 +318,80 @@ public class GUI {
                     handleException("downloading data", ex);
                 } catch (ExecutionException ex) {
                     handleException("downloading data", ex.getCause());
+                } finally {
+                    enable(true);
                 }
-                enable(true);
             }
         };
         worker.execute();
+    }
+    
+    private void doErase(ActionEvent ev) {
+        // TODO confirm
+        enable(false);
+        pageCount.setText(null);
+        SwingWorker<String, Void> worker = new SwingWorker<String, Void>() {
+            @Override
+            protected String doInBackground() throws Exception {
+                URL url = new URL(settings.eraseURL());
+                info("URL: %s%n", url);
+                byte[] page = httpService.read(url);
+                info("Data log erased - got download page: %d bytes%n", page.length);
+                return new String(page, settings.charset());
+            }
+            @Override
+            protected void done() {
+                String body;
+                try {
+                    body = get();
+                } catch (InterruptedException ex) {
+                    handleException("erasing data log", ex);
+                    refreshButton.setEnabled(true);
+                    return;
+                } catch (ExecutionException ex) {
+                    handleException("erasing data log", ex.getCause());
+                    refreshButton.setEnabled(true);
+                    return;
+                }
+                parseDownloadPage(body);
+            }
+        };
+        worker.execute();
+    }
+    
+    private void parseDownloadPage(String body) {
+        String count = "empty";
+        int first = 1;
+        int last = settings.maxPage();
+        enable(false);
+        try {
+            if (!PAGE_EMPTY.matcher(body).find()) {
+                Matcher matcher = PAGE_RANGE.matcher(body);
+                if (!matcher.find() || matcher.group(1) == null) {
+                    handleException("parsing download page", new IOException("unrecognized page format"));
+                } else {
+                    first = Integer.parseInt(matcher.group(1));
+                    info("first page: %d%n", first);
+                    if (matcher.group(2) == null) {
+                        last = first;
+                    } else {
+                        last = Integer.parseInt(matcher.group(2));
+                    }
+                    info("last page: %d%n", last);
+                    count = Integer.toString(last-first+1);
+                    enable(true);
+                }
+            }
+            pageCount.setText(count);
+            startModel.setValue(first);
+            startModel.setMinimum(first);
+            startModel.setMaximum(last);
+            endModel.setMinimum(first);
+            endModel.setMaximum(last);
+            endModel.setValue(last);
+        } finally {
+            refreshButton.setEnabled(true);
+        }
     }
     
     private void handleException(String message, Throwable ex) {

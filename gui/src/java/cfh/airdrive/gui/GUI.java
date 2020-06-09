@@ -27,7 +27,6 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
@@ -172,6 +171,8 @@ public class GUI {
         } else {
             info("HTTP service: %s %s%n", serviceTitle, servicePackage.getImplementationVersion());
         }
+        
+        doRefresh(null);
     }
     
     private JComponent createTitledPanel(String title) {

@@ -2,9 +2,11 @@ Download log data from the [AirDrive Keylogger](http://www.keelog.com/hardware-k
 
 The logger's user interface only allows downloading a file with a maximum of 5 pages with 2kB each. The downloaded files must also be joined manually. This application connects to the logger and download all, or a selected range of pages to one text file.
 
-## Usage
+## Download
 
 Download and installation instructions can be found in the [Releases section](https://github.com/Heuberger/AirDriveDownload/releases).
+
+## Usage
 
 1. connect the computer to the AirDrive Wi-Fi;
 2. start the application;
@@ -21,8 +23,9 @@ Issues and sugestions can be reported at the [Issues section](https://github.com
 
 ### GUI
 
-* `next`- Enchancements 1
+* `1.1.0`- Enchancements 1
   * button to erase logged data ([#5](https://github.com/Heuberger/AirDriveDownload/issues/5))
+  * do refresh at end of startup ([#8](https://github.com/Heuberger/AirDriveDownload/issues/8))
 * `1.0.0` - initial release
   - added title to main frame ([#10](https://github.com/Heuberger/AirDriveDownload/issues/10))
 
@@ -30,7 +33,7 @@ Issues and sugestions can be reported at the [Issues section](https://github.com
 
 * `1.0.0` - initial release
 
-
+-----
 
 # Test Server
 
@@ -40,5 +43,5 @@ Java 8.
 
 ## History
 
-- `next` - erase log data
+- `1.0.0` - erase log data
 - `0.0.1` - initial release

@@ -56,6 +56,8 @@ public class GUI {
     }
     
     
+    private final String VERSION = getClass().getPackage().getImplementationVersion();
+    
     private final Settings settings = Settings.instance();
     
     private final HttpService httpService;
@@ -104,23 +106,29 @@ public class GUI {
     private void initGUI() {
         pageCount.setEditable(false);
         pageCount.setColumns(5);
+        pageCount.setToolTipText("Number of available pages");
         
         refreshButton.setText("Refresh");
         refreshButton.addActionListener(this::doRefresh);
+        refreshButton.setToolTipText("Reload page count (start page)");
         
         startModel.addChangeListener(this::doStart);
         startPage.setModel(startModel);
         startPage.setEditor(new JSpinner.NumberEditor(startPage, settings.spinnerFormat()));
+        startPage.setToolTipText("First page to download");
         
         endPage.addChangeListener(this::doEnd);
         endPage.setModel(endModel);
         endPage.setEditor(new JSpinner.NumberEditor(endPage, settings.spinnerFormat()));
+        endPage.setToolTipText("Last page to download");
         
         downloadButton.setText("Download");
         downloadButton.addActionListener(this::doDownload);
+        downloadButton.setToolTipText("Download selected pages");
         
         eraseButton.setText("Erase");
         eraseButton.addActionListener(this::doErase);
+        eraseButton.setToolTipText("Delete all log data from AirDrive - no restore possible!");
         
         Insets insets = new Insets(2, 2, 2, 2);
         
@@ -156,9 +164,7 @@ public class GUI {
         frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
         frame.pack();  // TODO prefs
         frame.setLocationRelativeTo(null);  // TODO prefs
-        frame.setTitle(String.format("AirDrive Downloader %s - ©CFH",
-                getClass().getPackage().getImplementationVersion()
-                )); 
+        frame.setTitle(String.format("AirDrive Downloader %s - ©CFH", VERSION)); 
         frame.setVisible(true);
         
         enable(false);

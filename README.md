@@ -1,6 +1,6 @@
 # AirDriveDownload
 
-Download log data from a[AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
+Download log data from [AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
 
 Main page: [heuberger.github.io/AirdDriveDownload](https://heuberger.github.io/AirdDriveDownload). 
 

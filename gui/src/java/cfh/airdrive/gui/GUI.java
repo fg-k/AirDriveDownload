@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.concurrent.ExecutionException;
+import java.util.prefs.BackingStoreException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,9 +46,31 @@ import cfh.airdrive.http.HttpService;
 public class GUI {
 
     public static void main(String[] args) {
-        if (args.length > 0) {
-            Settings.baseURL(args[0]);
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            switch (arg.toLowerCase()) {
+                case "-clear": {
+                    try {
+                        Settings.clear();
+                        showMessageDialog(null, "Preferences reset", "Info", INFORMATION_MESSAGE);
+                    } catch (BackingStoreException ex) {
+                        ex.printStackTrace();
+                        showMessageDialog(null, ex.getMessage(), ex.getClass().getSimpleName(), ERROR_MESSAGE);
+                        return;
+                    }
+                }
+                break;
+                default: {
+                    Settings.baseURL(arg);
+                    if (i < args.length-1) {
+                        showMessageDialog(null, "additional arguments ignored", "Warning", WARNING_MESSAGE);
+                        i = args.length;
+                    }
+                }
+                break;
+            }
         }
+
         try {
             new GUI();
         } catch (Exception ex) {
@@ -76,6 +99,7 @@ public class GUI {
 
     private final JButton eraseButton = new JButton();
     
+    private final JButton clearButton = new JButton();
     private final JButton settingsButton = new JButton();
     
     private final JTextArea output = new JTextArea();
@@ -134,7 +158,11 @@ public class GUI {
         eraseButton.setForeground(Color.RED);
         eraseButton.setToolTipText("Delete all log data from AirDrive - no restore possible!");
         
-        settingsButton.setText("Edit");
+        clearButton.setText("Clear");
+        clearButton.addActionListener(this::doClear);
+        clearButton.setToolTipText("Clear output");
+        
+        settingsButton.setText("Settings");
         settingsButton.addActionListener(this::doSettings);
         settingsButton.setToolTipText("Edit settings");
         
@@ -151,12 +179,13 @@ public class GUI {
         addGridBag("End: ", endPage, download, 0, RELATIVE, insets);
         addGridBag(downloadButton, download, 0, RELATIVE, insets);
         
-        JComponent log = createTitledPanel("Log");
+        JComponent log = createTitledPanel("Keylogger");
         log.setLayout(new GridBagLayout());
-        addGridBag(eraseButton, log, 0, RELATIVE, insets);
+        addGridBag(eraseButton, log, 0, 0, insets);
         
-        JComponent control = createTitledPanel("Settings");
+        JComponent control = createTitledPanel("App");
         control.setLayout(new GridBagLayout());
+        addGridBag(clearButton, control, 0, 0, insets);
         addGridBag(settingsButton, control, 0, RELATIVE, insets);
         
         Box panel = Box.createHorizontalBox();
@@ -382,9 +411,21 @@ public class GUI {
         worker.execute();
     }
     
-    private void doSettings(ActionEvent ev) {
-        // TODO
+    private void doClear(ActionEvent ev) {
+        output.setText(null);
     }
+    
+    private void doSettings(ActionEvent ev) {
+        String old = settings.downloadURL();
+        if (settings.openGUI(frame, ev)) {
+            output.setFont(settings.outputFont());
+            output.setColumns(settings.outputColumns());
+            output.setRows(settings.outputRows());
+            if (!settings.downloadURL().equals(old)) {
+                doRefresh(ev);
+            }
+        }
+  }
     
     private void parseDownloadPage(String body) {
         enable(false);

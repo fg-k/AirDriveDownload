@@ -1,8 +1,10 @@
 # AirDriveDownload
 
-Download log data from [AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
+App to download log data from [AirDrive Keylogger](http://www.keelog.com/hardware-keylogger/).
 
 Main page: [heuberger.github.io/AirDriveDownload](https://heuberger.github.io/AirDriveDownload). 
+
+Download: [releases](https://github.com/Heuberger/AirDriveDownload/releases).
 
 This is an Eclipse workspace for Java version 8.
 

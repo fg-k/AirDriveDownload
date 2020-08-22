@@ -4,6 +4,7 @@ import static java.awt.GridBagConstraints.*;
 import static javax.swing.JOptionPane.*;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -75,6 +76,8 @@ public class GUI {
 
     private final JButton eraseButton = new JButton();
     
+    private final JButton settingsButton = new JButton();
+    
     private final JTextArea output = new JTextArea();
     
     private final Pattern PAGE_EMPTY = Pattern.compile("<b>The data log is empty.</b>");
@@ -128,7 +131,12 @@ public class GUI {
         
         eraseButton.setText("Erase");
         eraseButton.addActionListener(this::doErase);
+        eraseButton.setForeground(Color.RED);
         eraseButton.setToolTipText("Delete all log data from AirDrive - no restore possible!");
+        
+        settingsButton.setText("Edit");
+        settingsButton.addActionListener(this::doSettings);
+        settingsButton.setToolTipText("Edit settings");
         
         Insets insets = new Insets(2, 2, 2, 2);
         
@@ -147,10 +155,15 @@ public class GUI {
         log.setLayout(new GridBagLayout());
         addGridBag(eraseButton, log, 0, RELATIVE, insets);
         
+        JComponent control = createTitledPanel("Settings");
+        control.setLayout(new GridBagLayout());
+        addGridBag(settingsButton, control, 0, RELATIVE, insets);
+        
         Box panel = Box.createHorizontalBox();
         panel.add(refresh);
         panel.add(download);
         panel.add(log);
+        panel.add(control);
         
         output.setEditable(false);
         output.setFont(settings.outputFont());
@@ -164,7 +177,7 @@ public class GUI {
         frame.setDefaultCloseOperation(frame.DISPOSE_ON_CLOSE);
         frame.pack();  // TODO prefs
         frame.setLocationRelativeTo(null);  // TODO prefs
-        frame.setTitle(String.format("AirDrive Downloader %s - ©CFH", VERSION)); 
+        frame.setTitle(String.format("AirDrive Download %s - ©CFH", VERSION==null ? "dev" : VERSION)); 
         frame.setVisible(true);
         
         enable(false);
@@ -367,6 +380,10 @@ public class GUI {
             }
         };
         worker.execute();
+    }
+    
+    private void doSettings(ActionEvent ev) {
+        // TODO
     }
     
     private void parseDownloadPage(String body) {

@@ -4,7 +4,7 @@ The logger's user interface only allows downloading a file with a maximum of 5 p
 
 ## Download
 
-Download and installation instructions can be found in the [Releases section](https://github.com/Heuberger/AirDriveDownload/releases).
+Download and installation instructions can be found in the [Releases section](https://github.com/fg-k/AirDriveDownload/releases).
 
 ## Usage
 
@@ -17,17 +17,17 @@ Download and installation instructions can be found in the [Releases section](ht
 
 
 
-Issues and sugestions can be reported at the [Issues section](https://github.com/Heuberger/AirDriveDownload/issues).
+Issues and sugestions can be reported at the [Issues section](https://github.com/fg-k/AirDriveDownload/issues).
 
 ## History
 
 ### GUI
 
 * `1.1.0`- Enchancements 1
-  * button to erase logged data ([#5](https://github.com/Heuberger/AirDriveDownload/issues/5))
-  * do refresh at end of startup ([#8](https://github.com/Heuberger/AirDriveDownload/issues/8))
+  * button to erase logged data ([#5](https://github.com/fg-k/AirDriveDownload/issues/5))
+  * do refresh at end of startup ([#8](https://github.com/fg-k/AirDriveDownload/issues/8))
 * `1.0.0` - initial release
-  - added title to main frame ([#10](https://github.com/Heuberger/AirDriveDownload/issues/10))
+  - added title to main frame ([#10](https://github.com/fg-k/AirDriveDownload/issues/10))
 
 ### HTTP8
 
